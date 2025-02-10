@@ -35,30 +35,42 @@ class Category extends Model
     //     return $query->where('name', 'LIKE', '%' . $search . '%');
     // }
 
-    public function getAllowedFilters()
+    protected static $is_add = ['name', 'description'];
+    protected static $is_edit = ['name', 'description']; 
+    protected static $is_delete = ['name', 'description'];
+    protected static $is_filter = ['name', 'description'];
+
+
+    public static function getAllowedFields($type)
     {
-        return ['name'];
+        return match ($type) {
+            'add' => self::$is_add,
+            'edit' => self::$is_edit,
+            'delete' => self::$is_delete,
+            'filter' => self::$is_filter,
+            default => [],
+        };
     }
 
-    public function scopeSearch(Builder $query, $search)
-    {
-        return $query->where(function ($q) use ($search) {
-            $q->whereRaw("LOWER(name) LIKE LOWER(?)", ["%{$search}%"]);
-        });
-    }
+    // public function scopeSearch(Builder $query, $search)
+    // {
+    //     return $query->where(function ($q) use ($search) {
+    //         $q->whereRaw("LOWER(name) LIKE LOWER(?)", ["%{$search}%"]);
+    //     });
+    // }
 
 
-    public function scopeIsFilter(Builder $query, array $filters = [])
-    {
-        $allowedFilters = $this->getAllowedFilters(); // Ambil filter yang diperbolehkan dari method
+    // public function scopeIsFilter(Builder $query, array $filters = [])
+    // {
+    //     $allowedFilters = $this->getAllowedFilters(); // Ambil filter yang diperbolehkan dari method
 
-        foreach ($filters as $key => $value) {
-            if (in_array($key, $allowedFilters) && !empty($value)) {
-                $query->where($key, 'ILIKE', "%{$value}%");
-            }
+    //     foreach ($filters as $key => $value) {
+    //         if (in_array($key, $allowedFilters) && !empty($value)) {
+    //             $query->where($key, 'ILIKE', "%{$value}%");
+    //         }
 
-            return $query->orderBy('created_at', 'DESC');
-        }
-    }
+    //         return $query->orderBy('created_at', 'DESC');
+    //     }
+    // }
 
 }

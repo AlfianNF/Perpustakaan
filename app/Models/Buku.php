@@ -22,44 +22,73 @@ class Buku extends Model
         'category'
     ];
 
+    protected static $is_add = ['title', 'isbn', 'author', 'publish_date', 'category'];
+    protected static $is_edit = ['title', 'author', 'category']; 
+    protected static $is_delete = ['title', 'isbn', 'author', 'publish_date', 'category'];
+    protected static $is_filter = ['category'];
+    protected static $is_search = ['title', 'author'];
+    
+
     // public function scopeIsFilter(Builder $query){
     //     return $query->with(['category:id,name,description'],['peminjaman:id,'])
     //             ->orderBy('created_at', 'DESC')
     //             ->where('is_pinjam',false);
     // }
 
-    public function getAllowedFilters()
+    public static function getAllowedFields($type)
     {
-        return ['title', 'isbn', 'author', 'category'];
+        return match ($type) {
+            'add' => self::$is_add,
+            'edit' => self::$is_edit,
+            'delete' => self::$is_delete,
+            'filter' => self::$is_filter,
+            'search' => self::$is_search,
+            default => [],
+        };
     }
 
-    public function scopeSearch(Builder $query, $search)
-    {
-        return $query->where(function ($q) use ($search) {
-            $q->whereRaw("LOWER(title) LIKE LOWER(?)", ["%{$search}%"])
-            ->orWhere('isbn', 'LIKE', "%{$search}%")
-            ->orWhere('author', 'LIKE', "%{$search}%");
-        });
-    }
+    // public function scopeIsFilter(Builder $query, array $filters = [])
+    // {
+    //     $allowedFilters = self::$is_filter;
+
+    //     foreach ($filters as $key => $value) {
+    //         if (in_array($key, $allowedFilters) && !empty($value)) {
+    //             $query->whereRaw("LOWER($key) LIKE LOWER(?)", ["%{$value}%"]);
+    //         }
+    //     }
+
+    //     return $query->orderBy('created_at', 'DESC')
+    //         ->where('is_pinjam', false);
+    // }
 
 
-    public function scopeIsFilter(Builder $query, array $filters = [])
-    {
-        $allowedFilters = $this->allowedFilters;
+    // public function scopeSearch(Builder $query, $search)
+    // {
+    //     return $query->where(function ($q) use ($search) {
+    //         $q->whereRaw("LOWER(title) LIKE LOWER(?)", ["%{$search}%"])
+    //         ->orWhere('isbn', 'LIKE', "%{$search}%")
+    //         ->orWhere('author', 'LIKE', "%{$search}%");
+    //     });
+    // }
 
-        foreach ($filters as $key => $value) {
-            if (in_array($key, $allowedFilters) && !empty($value)) {
-                if ($key === 'title') {
-                    $query->whereRaw("LOWER(title) LIKE LOWER(?)", ["%{$value}%"]);
-                } else {
-                    $query->where($key, 'LIKE', "%{$value}%");
-                }
-            }
-        }
 
-        $query->orderBy('created_at', 'DESC')
-            ->where('is_pinjam', false);    
-    }
+    // public function scopeIsFilter(Builder $query, array $filters = [])
+    // {
+    //     $allowedFilters = $this->allowedFilters;
+
+    //     foreach ($filters as $key => $value) {
+    //         if (in_array($key, $allowedFilters) && !empty($value)) {
+    //             if ($key === 'title') {
+    //                 $query->whereRaw("LOWER(title) LIKE LOWER(?)", ["%{$value}%"]);
+    //             } else {
+    //                 $query->where($key, 'LIKE', "%{$value}%");
+    //             }
+    //         }
+    //     }
+
+    //     $query->orderBy('created_at', 'DESC')
+    //         ->where('is_pinjam', false);    
+    // }
 
 
     /**

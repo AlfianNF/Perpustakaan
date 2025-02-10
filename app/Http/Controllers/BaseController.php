@@ -30,31 +30,51 @@ class BaseController extends Controller
         return $classController;
     }
 
+    // public function index($model, Request $request)
+    // {
+    //     $baseModel = $this->getModel($model);
+
+    //     if (!class_exists($baseModel)) {
+    //         return response()->json(['message' => 'Model not found'], 404);
+    //     }
+
+    //     $query = $baseModel::query();
+
+    //     $allowedFilters = (new $baseModel)->getAllowedFields('filter');
+    //     $filters = $request->only($allowedFilters);
+    //     $query->isFilter($filters); 
+
+    //     $relations = (new $baseModel)->getRelations();
+    //     $query->with($relations);
+
+    //     if ($search = $request->query('search')) {
+    //         $query->search($search); 
+    //     }
+
+    //     $data = $query->paginate(10);
+
+    //     return response()->json($data, 200);
+    // }
+
     public function index($model, Request $request)
     {
         $baseModel = $this->getModel($model);
+        $baseController = $this->getController($model);
 
         if (!class_exists($baseModel)) {
             return response()->json(['message' => 'Model not found'], 404);
         }
 
-        $query = $baseModel::query();
+        $controller = app()->make($baseController);
 
-        $allowedFilters = (new $baseModel)->getAllowedFilters();
-        $filters = $request->only($allowedFilters);
-        $query->isFilter($filters); 
+        $response = app()->call([$controller, 'index'], ['request' => $request]);
 
-        $relations = (new $baseModel)->getRelations();
-        $query->with($relations);
-
-        if ($search = $request->query('search')) {
-            $query->search($search); 
-        }
-
-        $data = $query->paginate(10);
+        // Paginate hasil query
+        $data = $response->paginate(10);
 
         return response()->json($data, 200);
     }
+
 
 
     public function show($model, $id){
@@ -74,7 +94,7 @@ class BaseController extends Controller
     }
 
     public function store($model, Request $request){
-        $this->is_admin();
+        // $this->is_admin();
 
         $baseModel = $this->getModel($model);
         $baseController = $this->getController($model);
@@ -114,19 +134,34 @@ class BaseController extends Controller
         return response()->json($response,200);
     }
 
-    public function destroy($model,$id){
-        $this->is_admin();
-
+    public function destroy($model, $id)
+    {
+        $this->is_admin(); 
         $baseModel = $this->getModel($model);
 
-        if(!class_exists($baseModel)){
+        if (!class_exists($baseModel)) {
             return response()->json(['message' => 'Model not found'], 404);
         }
 
+        $allowedFields = $baseModel::getAllowedFields('delete');
+
         $data = $baseModel::find($id);
+
+        if (!$data) {
+            return response()->json(['message' => 'Data tidak ditemukan'], 404);
+        }
+
+        $filteredData = $data->only($allowedFields);
+
+        if (empty($filteredData)) {
+            return response()->json(['message' => 'Tidak ada field yang dapat dihapus'], 400);
+        }
+
         $data->delete();
-        return response()->json(['message' => 'Data berhasil di delete'], 200);
+
+        return response()->json(['message' => 'Data berhasil dihapus'], 200);
     }
+
 
     public function denda($model,Request $request,$id){
         $this->is_admin();

@@ -18,35 +18,53 @@ class Pinjam extends Model
         'id_buku','id_user','tgl_pinjam','tgl_kembali'
     ];
 
-    public function getAllowedFilters()
+    protected static $is_add = ['id_buku', 'id_user', 'tgl_pinjam', 'tgl_kembali'];
+    protected static $is_edit = ['tgl_pinjam', 'tgl_kembali']; 
+    protected static $is_delete = ['id_buku', 'id_user', 'tgl_pinjam', 'tgl_kembali'];
+    protected static $is_filter = ['id_buku', 'id_user'];
+    
+
+    // public function scopeIsFilter(Builder $query){
+    //     return $query->with(['category:id,name,description'],['peminjaman:id,'])
+    //             ->orderBy('created_at', 'DESC')
+    //             ->where('is_pinjam',false);
+    // }
+
+    public static function getAllowedFields($type)
     {
-        return ['id_buku','id_user'];
+        return match ($type) {
+            'add' => self::$is_add,
+            'edit' => self::$is_edit,
+            'delete' => self::$is_delete,
+            'filter' => self::$is_filter,
+            default => [],
+        };
     }
 
-    public function scopeSearch(Builder $query, $search)
-    {
-        return $query->where(function ($q) use ($search) {
-            $q->whereRaw("CAST(id_buku AS TEXT) LIKE ?", ["%{$search}%"])
-            ->orWhere('id_user', 'LIKE', "%{$search}%");
-        });
-    }
+    // public function scopeSearch(Builder $query, $search)
+    // {
+    //     return $query->where(function ($q) use ($search) {
+    //         $q->whereRaw("CAST(id_buku AS TEXT) LIKE ?", ["%{$search}%"])
+    //         ->orWhere('id_user', 'LIKE', "%{$search}%");
+    //     });
+    // }
 
-    public function scopeIsFilter(Builder $query, array $filters = [])
-    {
-        $allowedFilters = $this->getAllowedFilters();
+    // public function scopeIsFilter(Builder $query, array $filters = [])
+    // {
+    //     $allowedFilters = $this->getAllowedFilters();
 
-        foreach ($filters as $key => $value) {
-            if (in_array($key, $allowedFilters) && !empty($value)) {
-                if ($key === 'id_buku') {
-                    $query->whereRaw("CAST(id_buku AS TEXT) ILIKE ?", ["%{$value}%"]);
-                } else {
-                    $query->where($key, 'ILIKE', "%{$value}%");
-                }
-            }
-        }
+    //     foreach ($filters as $key => $value) {
+    //         if (in_array($key, $allowedFilters) && !empty($value)) {
+    //             if ($key === 'id_buku') {
+    //                 $query->whereRaw("CAST(id_buku AS TEXT) ILIKE ?", ["%{$value}%"]);
+    //             } else {
+    //                 $query->where($key, 'ILIKE', "%{$value}%");
+    //             }
+    //         }
+    //     }
 
-        return $query->orderBy('created_at', 'DESC');
-    }
+    //     return $query->orderBy('created_at', 'DESC');
+    // }
 
 
 
