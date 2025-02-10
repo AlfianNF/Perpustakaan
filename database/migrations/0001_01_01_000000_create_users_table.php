@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('no_induk')->unique();
-            $table->string('no_hp')->max(13);
+            $table->string('email');
             $table->boolean('is_admin')->default(false);
             $table->string('password');
             $table->rememberToken();

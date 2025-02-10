@@ -24,9 +24,14 @@ class User extends Authenticatable
         'name',
         'password',
         'no_induk',
-        'no_hp',
+        'email',
         'is_admin'
     ];
+
+    // public function setIsAdminAttribute($value)
+    // {
+    //     $this->attributes['is_admin'] = $value ?? false;
+    // }
 
     /**
      * The attributes that should be hidden for serialization.

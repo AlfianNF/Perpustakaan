@@ -10,31 +10,49 @@ use Illuminate\Support\Facades\DB;
 class PinjamController extends Controller
 {
 
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         $query = Pinjam::query();
 
-        // Mengambil daftar field yang bisa difilter
+        // Ambil daftar field yang bisa difilter
         $filters = $request->only((new Pinjam)->getAllowedFields('filter'));
 
-        // Menerapkan filter dari request
+        // Terapkan filter
         if (!empty($filters)) {
             $allowedFilters = Pinjam::getAllowedFields('filter');
 
             foreach ($filters as $key => $value) {
                 if (in_array($key, $allowedFilters) && !empty($value)) {
-                    $query->whereRaw("CAST($key AS TEXT) LIKE ?", ["%{$value}%"]);
+                    if (in_array($key, ['tgl_pinjam', 'tgl_kembali'])) {
+                        $query->whereDate($key, $value);
+                    } else {
+                        $query->where($key, 'LIKE', "%{$value}%");
+                    }
                 }
             }
         }
 
-        // Mengambil relasi jika ada
+        $search = $request->input('search');
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('userPinjam', function ($userQuery) use ($search) {
+                    $userQuery->whereRaw("LOWER(name) LIKE LOWER(?)", ["%{$search}%"]); // Search in user name
+                })->orWhereHas('buku', function ($bukuQuery) use ($search) {
+                    $bukuQuery->whereRaw("LOWER(title) LIKE LOWER(?)", ["%{$search}%"]); // Search in book title
+                });
+            });
+        }
+
+        // Ambil relasi jika ada
         $query->with((new Pinjam)->getRelations());
 
-        // Mengurutkan dan filter tambahan
+        // Urutkan berdasarkan tanggal dibuat
         $query->orderBy('created_at', 'DESC');
 
-        return $query;
+        return $query; // Kembalikan sebagai JSON
     }
+
+    
 
     // public function store(Request $request)
     // {

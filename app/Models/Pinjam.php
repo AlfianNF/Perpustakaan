@@ -21,7 +21,8 @@ class Pinjam extends Model
     protected static $is_add = ['id_buku', 'id_user', 'tgl_pinjam', 'tgl_kembali'];
     protected static $is_edit = ['tgl_pinjam', 'tgl_kembali']; 
     protected static $is_delete = ['id_buku', 'id_user', 'tgl_pinjam', 'tgl_kembali'];
-    protected static $is_filter = ['id_buku', 'id_user'];
+    protected static $is_filter = ['tgl_pinjam', 'tgl_kembali'];
+    protected static $is_search = ['id_buku', 'id_user'];
     
 
     // public function scopeIsFilter(Builder $query){
@@ -37,6 +38,7 @@ class Pinjam extends Model
             'edit' => self::$is_edit,
             'delete' => self::$is_delete,
             'filter' => self::$is_filter,
+            'search' => self::$is_search,
             default => [],
         };
     }
@@ -105,7 +107,7 @@ class Pinjam extends Model
                 $query->select('id', 'name'); 
             },
             'buku' => function ($query) {
-                $query->select('id','isbn', 'author','category','publish_date')
+                $query->select('id','title','isbn', 'author','category','publish_date')
                     ->with([
                         'category:id,name' 
                     ]); 

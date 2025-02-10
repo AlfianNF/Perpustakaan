@@ -94,7 +94,7 @@ class BaseController extends Controller
     }
 
     public function store($model, Request $request){
-        // $this->is_admin();
+        $this->is_admin();
 
         $baseModel = $this->getModel($model);
         $baseController = $this->getController($model);

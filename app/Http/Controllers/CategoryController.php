@@ -21,31 +21,21 @@ class CategoryController extends Controller
     //     return response()->json($category,201);
     // }
 
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         $query = Category::query();
 
-        // Mengambil daftar field yang bisa difilter
-        $filters = $request->only((new Category)->getAllowedFields('filter'));
+        $search = $request->input('search');
 
-        // Menerapkan filter dari request
-        if (!empty($filters)) {
-            $allowedFilters = Category::getAllowedFields('filter');
-
-            foreach ($filters as $key => $value) {
-                if (in_array($key, $allowedFilters) && !empty($value)) {
-                    $query->whereRaw("LOWER($key) LIKE LOWER(?)", ["%{$value}%"]);
-                }
-            }
+        if (!empty($search)) {
+            $query->where('name', 'ILIKE', "%{$search}%"); 
         }
 
-        // Mengambil relasi jika ada
-        $query->with((new Category)->getRelations());
-
-        // Mengurutkan dan filter tambahan
         $query->orderBy('created_at', 'DESC');
 
         return $query;
     }
+
 
     public function store(Request $request)
     {

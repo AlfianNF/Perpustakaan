@@ -22,7 +22,8 @@ class Kembali extends Model
     protected static $is_add = ['id_buku', 'id_user', 'id_pinjam', 'tgl_kembali', 'tgl_pinjam', 'denda'];
     protected static $is_edit = ['denda']; 
     protected static $is_delete = ['id_buku', 'id_user', 'id_pinjam', 'tgl_kembali', 'tgl_pinjam', 'denda'];
-    protected static $is_filter = ['id_buku', 'id_user'];
+    protected static $is_filter = ['denda'];
+    protected static $is_search = ['id_buku', 'id_user'];
     
 
     public static function getAllowedFields($type)
@@ -32,6 +33,7 @@ class Kembali extends Model
             'edit' => self::$is_edit,
             'delete' => self::$is_delete,
             'filter' => self::$is_filter,
+            'search' => self::$is_search,
             default => [],
         };
     }

@@ -19,12 +19,13 @@ class Buku extends Model
         'author',
         'publish_date',
         'is_pinjam',
-        'category'
+        'category',
+        'image'
     ];
 
-    protected static $is_add = ['title', 'isbn', 'author', 'publish_date', 'category'];
-    protected static $is_edit = ['title', 'author', 'category']; 
-    protected static $is_delete = ['title', 'isbn', 'author', 'publish_date', 'category'];
+    protected static $is_add = ['title', 'isbn', 'author', 'publish_date', 'category','image'];
+    protected static $is_edit = ['title', 'author', 'category','image']; 
+    protected static $is_delete = ['title', 'isbn', 'author', 'publish_date', 'category','image'];
     protected static $is_filter = ['category'];
     protected static $is_search = ['title', 'author'];
     

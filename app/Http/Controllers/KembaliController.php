@@ -11,30 +11,71 @@ use Illuminate\Support\Facades\DB;
 
 class KembaliController extends Controller
 {
-    public function index(Request $request){
+    // public function index(Request $request){
+    //     $query = Kembali::query();
+
+    //     // Mengambil daftar field yang bisa difilter
+    //     $filters = $request->only((new Kembali)->getAllowedFields('filter'));
+
+    //     // Menerapkan filter dari request
+    //     if (!empty($filters)) {
+    //         $allowedFilters = Kembali::getAllowedFields('filter');
+
+    //         foreach ($filters as $key => $value) {
+    //             if (in_array($key, $allowedFilters) && !empty($value)) {
+    //                 $query->whereRaw("CAST($key AS TEXT) LIKE ?", ["%{$value}%"]);
+    //             }
+    //         }
+    //     }
+
+    //     // Mengambil relasi jika ada
+    //     $query->with((new Kembali)->getRelations());
+
+    //     // Mengurutkan dan filter tambahan
+    //     $query->orderBy('created_at', 'DESC');
+
+    //     return $query;
+    // }
+
+    public function index(Request $request)
+    {
         $query = Kembali::query();
 
-        // Mengambil daftar field yang bisa difilter
         $filters = $request->only((new Kembali)->getAllowedFields('filter'));
-
-        // Menerapkan filter dari request
         if (!empty($filters)) {
             $allowedFilters = Kembali::getAllowedFields('filter');
-
             foreach ($filters as $key => $value) {
                 if (in_array($key, $allowedFilters) && !empty($value)) {
-                    $query->whereRaw("CAST($key AS TEXT) LIKE ?", ["%{$value}%"]);
+                    if ($key === 'denda') {
+                        if ($value === 'ada') {
+                            $query->where('denda', '>', 0); // Filter denda yang ada (lebih dari 0)
+                        } elseif ($value === 'tidak') {
+                            $query->where('denda', 0); // Filter denda yang tidak ada (0)
+                        }
+                    } else {
+                        $query->whereRaw("LOWER($key) LIKE LOWER(?)", ["%{$value}%"]);
+                    }
                 }
             }
         }
 
-        // Mengambil relasi jika ada
+        // Search
+        $search = $request->input('search');
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('peminjaman.userPinjam', function ($userQuery) use ($search) {
+                    $userQuery->whereRaw("LOWER(name) LIKE LOWER(?)", ["%{$search}%"]); // Search in user name
+                })->orWhereHas('peminjaman.buku', function ($bukuQuery) use ($search) {
+                    $bukuQuery->whereRaw("LOWER(title) LIKE LOWER(?)", ["%{$search}%"]); // Search in book title
+                });
+            });
+        }
+
         $query->with((new Kembali)->getRelations());
 
-        // Mengurutkan dan filter tambahan
         $query->orderBy('created_at', 'DESC');
 
-        return $query;
+        return $query; 
     }
 
     // public function store(Request $request)

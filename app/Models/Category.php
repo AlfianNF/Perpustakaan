@@ -38,7 +38,7 @@ class Category extends Model
     protected static $is_add = ['name', 'description'];
     protected static $is_edit = ['name', 'description']; 
     protected static $is_delete = ['name', 'description'];
-    protected static $is_filter = ['name', 'description'];
+    protected static $is_search = ['name'];
 
 
     public static function getAllowedFields($type)
@@ -47,7 +47,7 @@ class Category extends Model
             'add' => self::$is_add,
             'edit' => self::$is_edit,
             'delete' => self::$is_delete,
-            'filter' => self::$is_filter,
+            'search' => self::$is_search,
             default => [],
         };
     }

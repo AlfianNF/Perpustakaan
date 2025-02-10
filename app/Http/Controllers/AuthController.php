@@ -13,18 +13,17 @@ class AuthController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'no_induk' => 'required|integer',
-            'no_hp' => 'required|numeric',
-            'password' => 'required|string|min:8', 
-            'is_admin' => 'nullable',
+            'no_induk' => 'required|unique:users,no_induk',
+            'email' => 'required|email',
+            'password' => 'required|string|min:8',
         ]);
 
         $user = User::create([
             'name' => $validated['name'],
             'no_induk' => $validated['no_induk'],
-            'no_hp' => $validated['no_hp'],
+            'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'is_admin' => $validated['is_admin'],
+            'is_admin' => false, 
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -38,6 +37,7 @@ class AuthController extends Controller
             ],
         ], 201);
     }
+
 
     public function login(Request $request)
     {

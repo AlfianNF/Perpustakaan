@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Buku;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class BukuController extends Controller
@@ -30,29 +31,46 @@ class BukuController extends Controller
 
     public function index(Request $request){
         $query = Buku::query();
-
-        // Mengambil daftar field yang bisa difilter
-        $filters = $request->only((new Buku)->getAllowedFields('filter'));
-
+        
         // Menerapkan filter dari request
+        $filters = $request->only((new Buku)->getAllowedFields('filter'));
         if (!empty($filters)) {
             $allowedFilters = Buku::getAllowedFields('filter');
-
             foreach ($filters as $key => $value) {
                 if (in_array($key, $allowedFilters) && !empty($value)) {
-                    $query->whereRaw("LOWER($key) LIKE LOWER(?)", ["%{$value}%"]);
+                    if ($key === 'category') {
+                        $query->whereHas('category', function ($q) use ($value) { // Use 'category' here
+                            $q->whereRaw("LOWER(name) LIKE LOWER(?)", ["%{$value}%"]);
+                        });
+                    } else {
+                        $query->whereRaw("LOWER($key) LIKE LOWER(?)", ["%{$value}%"]);
+                    }
                 }
             }
         }
+    
+        // Menerapkan search dari request
+        $search = $request->input('search'); 
 
+        if ($search) { // Check if $search is not empty
+            $allowedSearch = Buku::getAllowedFields('search');
+
+            $query->where(function ($q) use ($search, $allowedSearch) {
+                foreach ($allowedSearch as $field) { // Iterate through allowed search fields
+                    $q->orWhereRaw("LOWER($field) LIKE LOWER(?)", ["%{$search}%"]);
+                }
+            });
+        }
+    
         // Mengambil relasi jika ada
         $query->with((new Buku)->getRelations());
-
+    
         // Mengurutkan dan filter tambahan
         $query->orderBy('created_at', 'DESC')->where('is_pinjam', false);
-
+    
         return $query;
     }
+    
 
     public function store(Request $request)
     {
@@ -62,6 +80,14 @@ class BukuController extends Controller
         // Validasi hanya field yang diperbolehkan
         $validated = $request->only($allowedFields);
 
+        if ($request->hasFile('image')) {
+            $request->validate([
+                'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048' // Maksimal 2MB
+            ]);
+    
+            // Simpan gambar ke storage/public/images/bukus
+            $validated['image'] = $request->file('image')->store('images/buku', 'public');    
+        }
         // Simpan data ke database
         $buku = Buku::create($validated);
 
@@ -70,6 +96,7 @@ class BukuController extends Controller
             'data' => $buku
         ]);
     }
+
 
     public function update(Request $request, $id)
     {
@@ -86,6 +113,21 @@ class BukuController extends Controller
         // Validasi hanya field yang diperbolehkan
         $validatedData = $request->only($allowedFields);
 
+        // Jika ada gambar baru yang diunggah
+        if ($request->hasFile('image')) {
+            $request->validate([
+                'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048' // Maksimal 2MB
+            ]);
+
+            // Hapus gambar lama jika ada
+            if ($buku->image) {
+                Storage::disk('public')->delete($buku->image);
+            }
+
+            // Simpan gambar baru
+            $validatedData['image'] = $request->file('image')->store('images/bukus', 'public');
+        }
+
         // Jika tidak ada data yang valid, kembalikan error
         if (empty($validatedData)) {
             return response()->json(['message' => 'Tidak ada field yang diperbarui'], 400);
@@ -96,7 +138,16 @@ class BukuController extends Controller
 
         return response()->json([
             'message' => 'Data berhasil diperbarui',
-            'data' => $buku
+            'data' => [
+                'id' => $buku->id,
+                'title' => $buku->title,
+                'isbn' => $buku->isbn,
+                'author' => $buku->author,
+                'category' => $buku->category,
+                'publish_date' => $buku->publish_date,
+                'is_pinjam' => $buku->is_pinjam,
+                'image_url' => $buku->image ? asset('storage/' . $buku->image) : null // URL gambar
+            ]
         ], 200);
     }
 
