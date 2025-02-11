@@ -9,8 +9,8 @@ use App\Http\Controllers\BaseController;
 //     return $request->user();
 // })->middleware('auth:sanctum');
 
+Route::get('{model}/list',[BaseController::class,'index']);
 Route::middleware('auth:sanctum')->group(function(){
-    Route::get('{model}/list',[BaseController::class,'index']);
     Route::get('{model}/{id}/show',[BaseController::class,'show']);
     
     //admin

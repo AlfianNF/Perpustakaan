@@ -22,7 +22,8 @@ class BukuFactory extends Factory
             'author' => $this->faker->name(),
             'publish_date' => $this->faker->date(),
             'is_pinjam' => $this->faker->boolean(20),
-            'category' => rand(1,3) 
+            'category' => rand(1,3),
+            'image' => 'https://picsum.photos/seed/' . rand(1, 1000) . '/640/480'
         ];
     }
 }

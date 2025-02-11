@@ -33,19 +33,19 @@ class BukuController extends Controller
         $query = Buku::query();
         
         // Menerapkan filter dari request
-        $filters = $request->only((new Buku)->getAllowedFields('filter'));
+        $filters = $request->only(Buku::getAllowedFields('filter'));
+
         if (!empty($filters)) {
-            $allowedFilters = Buku::getAllowedFields('filter');
-            foreach ($filters as $key => $value) {
-                if (in_array($key, $allowedFilters) && !empty($value)) {
-                    if ($key === 'category') {
-                        $query->whereHas('category', function ($q) use ($value) { // Use 'category' here
-                            $q->whereRaw("LOWER(name) LIKE LOWER(?)", ["%{$value}%"]);
-                        });
-                    } else {
-                        $query->whereRaw("LOWER($key) LIKE LOWER(?)", ["%{$value}%"]);
-                    }
+            // Tangani filter 'category' terlebih dahulu jika ada
+            if (isset($filters['category'])) {
+                $categoryValue = $filters['category'];
+                if (!empty($categoryValue)) {
+                    $query->whereHas('category', function ($q) use ($categoryValue) {
+                        $q->whereRaw("LOWER(name) LIKE LOWER(?)", ["%{$categoryValue}%"]);
+                    });
                 }
+                // Hapus filter 'category' dari array $filters agar tidak diproses lagi di loop
+                unset($filters['category']);
             }
         }
     
@@ -66,8 +66,9 @@ class BukuController extends Controller
         $query->with((new Buku)->getRelations());
     
         // Mengurutkan dan filter tambahan
-        $query->orderBy('created_at', 'DESC')->where('is_pinjam', false);
-    
+        $query->orderByRaw('LENGTH(title), title')->where('is_pinjam', false);
+        // $query->orderBy('created_at', 'DESC')->where('is_pinjam', false);
+
         return $query;
     }
     

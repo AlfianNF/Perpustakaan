@@ -70,7 +70,7 @@ class BaseController extends Controller
         $response = app()->call([$controller, 'index'], ['request' => $request]);
 
         // Paginate hasil query
-        $data = $response->paginate(10);
+        $data = $response->paginate(21);
 
         return response()->json($data, 200);
     }

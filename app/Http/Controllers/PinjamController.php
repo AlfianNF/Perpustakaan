@@ -113,6 +113,17 @@ class PinjamController extends Controller
             'tgl_kembali' => 'required|date',
         ]);
 
+        // Cek apakah buku tersedia
+        $buku = Buku::find($validated['id_buku']);
+
+        if (!$buku) {
+            return response()->json(['message' => 'Buku tidak ditemukan'], 404);
+        }
+
+        if ($buku->is_pinjam) {
+            return response()->json(['message' => 'Buku ini sedang dipinjam, peminjaman dibatalkan'], 400);
+        }
+
         // Mulai transaksi database
         DB::beginTransaction();
 
@@ -121,12 +132,7 @@ class PinjamController extends Controller
             $pinjam = Pinjam::create($validated);
 
             // Update status buku agar is_pinjam menjadi true
-            if ($buku = Buku::find($validated['id_buku'])) {
-                $buku->update(['is_pinjam' => true]);
-            } else {
-                DB::rollBack();
-                return response()->json(['message' => 'Buku tidak ditemukan'], 404);
-            }
+            $buku->update(['is_pinjam' => true]);
 
             // Commit transaksi
             DB::commit();
@@ -142,6 +148,7 @@ class PinjamController extends Controller
             return response()->json(['message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
     }
+
 
     public function update(Request $request, $id)
     {

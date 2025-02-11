@@ -19,6 +19,7 @@ return new class extends Migration
             $table->date('tgl_pinjam')->default(DB::raw('CURRENT_DATE'));
             $table->date('tgl_kembali');
             $table->timestamps();
+            // $table->softDeletes();
 
             $table->foreign('id_user')->references('id')->on('users');
             $table->foreign('id_buku')->references('id')->on('bukus');
