@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Buku;
+use App\Models\Pinjam;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -150,6 +151,32 @@ class BukuController extends Controller
                 'image_url' => $buku->image ? asset('storage/' . $buku->image) : null // URL gambar
             ]
         ], 200);
+    }
+
+    public function pinjam(){
+        $user = auth()->user()->id;
+        $pinjam = Pinjam::where('id_user', $user)
+                        ->where('status', 'dipinjam')
+                        ->with(['buku:id,title,isbn,author,category','buku.category:id,name'])
+                        ->get();
+        
+        if($pinjam->isEmpty()){
+            return response()->json(['message' => 'Anda belum meminjam buku'],200);
+        }
+        return response()->json($pinjam,200);
+    }
+
+    public function recentlyRead(){
+        $user = auth()->user()->id;
+        $pinjam = Pinjam::where('id_user', $user)
+                        ->where('status', 'dikembalikan')
+                        ->with(['buku:id,title,isbn,author,category','buku.category:id,name'])
+                        ->get();
+        
+        if($pinjam->isEmpty()){
+            return response()->json(['message' => 'Anda belum meminjam buku'],200);
+        }
+        return response()->json($pinjam,200);
     }
 
 

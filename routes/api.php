@@ -4,14 +4,18 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BaseController;
+use App\Http\Controllers\BukuController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');
 
-Route::get('{model}/list',[BaseController::class,'index']);
 Route::middleware('auth:sanctum')->group(function(){
+    Route::get('{model}/list',[BaseController::class,'index']);
     Route::get('{model}/{id}/show',[BaseController::class,'show']);
+
+    Route::get('profil/pinjam',[BukuController::class,'pinjam']);
+    Route::get('buku/recently-read',[BukuController::class,'recentlyRead']);
     
     //admin
     Route::middleware('is_admin')->group(function(){

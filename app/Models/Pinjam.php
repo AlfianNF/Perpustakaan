@@ -16,12 +16,12 @@ class Pinjam extends Model
     use HasFactory;
 
     protected $fillable = [
-        'id_buku','id_user','tgl_pinjam','tgl_kembali'
+        'id_buku','id_user','tgl_pinjam','tgl_kembali','status'
     ];
 
-    protected static $is_add = ['id_buku', 'id_user', 'tgl_pinjam', 'tgl_kembali'];
-    protected static $is_edit = ['tgl_pinjam', 'tgl_kembali']; 
-    protected static $is_delete = ['id_buku', 'id_user', 'tgl_pinjam', 'tgl_kembali'];
+    protected static $is_add = ['id_buku', 'id_user', 'tgl_pinjam', 'tgl_kembali','status'];
+    protected static $is_edit = ['tgl_pinjam', 'tgl_kembali','status']; 
+    protected static $is_delete = ['id_buku', 'id_user', 'tgl_pinjam', 'tgl_kembali','status'];
     protected static $is_filter = ['tgl_pinjam', 'tgl_kembali'];
     protected static $is_search = ['id_buku', 'id_user'];
     

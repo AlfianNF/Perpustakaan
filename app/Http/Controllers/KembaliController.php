@@ -181,6 +181,8 @@ class KembaliController extends Controller
                 return response()->json(['message' => 'Buku tidak ditemukan'], 404);
             }
 
+            $pinjam->update(['status' => 'dikembalikan']);
+
             DB::commit();
 
             return response()->json([

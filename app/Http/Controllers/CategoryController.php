@@ -23,6 +23,7 @@ class CategoryController extends Controller
 
     public function index(Request $request)
     {
+        $query = Category::select('name', 'description');
         $query = Category::query();
 
         $search = $request->input('search');
@@ -31,7 +32,7 @@ class CategoryController extends Controller
             $query->where('name', 'ILIKE', "%{$search}%"); 
         }
 
-        $query->orderBy('created_at', 'DESC');
+        $query->orderBy('name', 'asc');
 
         return $query;
     }
