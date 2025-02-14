@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Services\CoreService;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Validator;
 
 class BaseController extends Controller
 {
@@ -56,6 +59,24 @@ class BaseController extends Controller
     //     return response()->json($data, 200);
     // }
 
+    public function isList($model)
+    {
+        $table = Str::snake(Str::plural($model)); 
+    
+        if (!Schema::hasTable($table)) {
+            return response()->json(['message' => 'Table not found'], 404);
+        }
+    
+        $columns = Schema::getColumnListing($table);
+    
+        return response()->json([
+            'model' => $model,
+            'table' => $table,
+            'columns' => $columns
+        ], 200);
+    }
+    
+
     public function index($model, Request $request)
     {
         $baseModel = $this->getModel($model);
@@ -93,57 +114,103 @@ class BaseController extends Controller
         return response()->json($data,200);
     }
 
-    public function store($model, Request $request){
-        $this->is_admin();
+    public function store($model, Request $request)
+    {
+        return app(CoreService::class)->handleRequest($model, $request, null, 'store');
+    }
 
-        $baseModel = $this->getModel($model);
-        $baseController = $this->getController($model);
+    public function update($model, Request $request, $id)
+    {
+        return app(CoreService::class)->handleRequest($model, $request, $id, 'update');
+    }
+    
 
-        if(!class_exists($baseModel)){
-            return response()->json(['message' => 'Model not found'], 404);
-        }
-        if(!class_exists($baseController)){
-            return response()->json(['message' => 'Controller not found'], 404);
-        }
+    // public function store($model, Request $request){
+    //     $this->is_admin();
+
+    //     $baseModel = $this->getModel($model);
+    //     $baseController = $this->getController($model);
+
+    //     if(!class_exists($baseModel)){
+    //         return response()->json(['message' => 'Model not found'], 404);
+    //     }
+    //     if(!class_exists($baseController)){
+    //         return response()->json(['message' => 'Controller not found'], 404);
+    //     }
         
-        $controller = app()->make($baseController);
+    //     $controller = app()->make($baseController);
 
-        $response = app()->call([$controller, 'store'], ['request' => $request]);
+    //     $response = app()->call([$controller, 'store'], ['request' => $request]);
 
-        return response()->json($response,201);
-    }
+    //     return response()->json($response,201);
+    // }
 
-    public function update($model, Request $request,$id){
-        $this->is_admin();
+    // public function update($model, Request $request,$id){
+    //     $this->is_admin();
 
-        $baseModel = $this->getModel($model);
-        $baseController = $this->getController($model);
+    //     $baseModel = $this->getModel($model);
+    //     $baseController = $this->getController($model);
 
-        if(!class_exists($baseModel)){
-            return response()->json(['message' => 'Model not found'], 404);
-        }
+    //     if(!class_exists($baseModel)){
+    //         return response()->json(['message' => 'Model not found'], 404);
+    //     }
 
-        if(!class_exists($baseController)){
-            return response()->json(['message' => 'Controller not found'], 404);
-        }
+    //     if(!class_exists($baseController)){
+    //         return response()->json(['message' => 'Controller not found'], 404);
+    //     }
 
-        $controller = app()->make($baseController);
+    //     $controller = app()->make($baseController);
 
-        $response = app()->call([$controller, 'update'], ['request' => $request,'id' => $id]);
+    //     $response = app()->call([$controller, 'update'], ['request' => $request,'id' => $id]);
 
-        return response()->json($response,200);
-    }
+    //     return response()->json($response,200);
+    // }
+
+    // public function destroy($model, $id)
+    // {
+    //     $this->is_admin(); 
+    //     $baseModel = $this->getModel($model);
+
+    //     if (!class_exists($baseModel)) {
+    //         return response()->json(['message' => 'Model not found'], 404);
+    //     }
+
+    //     $allowedFields = $baseModel::getAllowedFields('delete');
+
+    //     $data = $baseModel::find($id);
+
+    //     if (!$data) {
+    //         return response()->json(['message' => 'Data tidak ditemukan'], 404);
+    //     }
+
+    //     $filteredData = $data->only($allowedFields);
+
+    //     if (empty($filteredData)) {
+    //         return response()->json(['message' => 'Tidak ada field yang dapat dihapus'], 400);
+    //     }
+
+    //     $data->delete();
+
+    //     return response()->json(['message' => 'Data berhasil dihapus'], 200);
+    // }
 
     public function destroy($model, $id)
     {
-        $this->is_admin(); 
+        $this->is_admin();
         $baseModel = $this->getModel($model);
 
         if (!class_exists($baseModel)) {
             return response()->json(['message' => 'Model not found'], 404);
         }
 
-        $allowedFields = $baseModel::getAllowedFields('delete');
+        $allowedFields = $baseModel::getAllowedFields('delete'); 
+        $isListResponse = $this->isList($model); 
+
+        if ($isListResponse->getStatusCode() !== 200) {
+            return $isListResponse; 
+        }
+
+        $isListColumns = $isListResponse->getData(true)['columns'];
 
         $data = $baseModel::find($id);
 
@@ -151,13 +218,23 @@ class BaseController extends Controller
             return response()->json(['message' => 'Data tidak ditemukan'], 404);
         }
 
-        $filteredData = $data->only($allowedFields);
-
-        if (empty($filteredData)) {
-            return response()->json(['message' => 'Tidak ada field yang dapat dihapus'], 400);
+        foreach ($allowedFields as $field) {
+            if (!isset($data->$field)) {
+                return response()->json(['message' => 'Tidak diizinkan menghapus field ini'], 400);
+            }
         }
 
-        $data->delete();
+        if (!empty($isListColumns)) {
+            foreach ($isListColumns as $column) {
+                if (!isset($data->$column)) {
+                    return response()->json(['message' => 'Data ini tidak ditemukan di daftar kolom'], 400);
+                }
+            }
+        }
+
+        dd($data);
+
+        $data->delete(); 
 
         return response()->json(['message' => 'Data berhasil dihapus'], 200);
     }
@@ -186,9 +263,9 @@ class BaseController extends Controller
         return response()->json($response,200);
     }
 
-    public function index2()
-    {
-        $data = $this->coreService->index(); // Akses service
-        return response()->json($data); // Lebih baik return response()->json()
-    }
+    // public function index2()
+    // {
+    //     $data = $this->coreService->index(); // Akses service
+    //     return response()->json($data); // Lebih baik return response()->json()
+    // }
 }

@@ -26,14 +26,12 @@ class AuthController extends Controller
             'is_admin' => false, 
         ]);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'success' => true,
             'message' => 'User berhasil dibuat',
             'data' => [
                 'user' => $user,
-                'token' => $token,
             ],
         ], 201);
     }

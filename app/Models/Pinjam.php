@@ -24,6 +24,14 @@ class Pinjam extends Model
     protected static $is_delete = ['id_buku', 'id_user', 'tgl_pinjam', 'tgl_kembali','status'];
     protected static $is_filter = ['tgl_pinjam', 'tgl_kembali'];
     protected static $is_search = ['id_buku', 'id_user'];
+
+    protected static $rules = [ // Validation rules
+        'id_buku' => 'required',
+        'id_user' => 'required', 
+        'tgl_pinjam' => 'required|date',
+        'tgl_kembali' => 'required|date',
+        'status' => 'nullable',
+    ];
     
 
     // public function scopeIsFilter(Builder $query){
@@ -42,6 +50,19 @@ class Pinjam extends Model
             'search' => self::$is_search,
             default => [],
         };
+    }
+
+    public static function getValidationRules($type)
+    {
+        $allowedFields = self::getAllowedFields($type);
+        $rules = [];
+
+        foreach ($allowedFields as $field) {
+            if (isset(self::$rules[$field])) {
+                $rules[$field] = self::$rules[$field];
+            }
+        }
+        return $rules;
     }
 
     // public function scopeSearch(Builder $query, $search)

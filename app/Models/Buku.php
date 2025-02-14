@@ -23,6 +23,15 @@ class Buku extends Model
         'image'
     ];
 
+    protected static $rules = [ // Validation rules
+        'title' => 'required|string|max:255',
+        'isbn' => 'required|string|max:20|unique:bukus,isbn', // Example unique rule
+        'author' => 'required|string|max:255',
+        'publish_date' => 'required|date',
+        'category' => 'required|exists:categories,id', // Ensure category exists
+        'nullable|image|mimes:png,jpg,jpeg|max:2048'
+    ];
+
     protected static $is_add = ['title', 'isbn', 'author', 'publish_date', 'category','image'];
     protected static $is_edit = ['title', 'author', 'category','image']; 
     protected static $is_delete = ['title', 'isbn', 'author', 'publish_date', 'category','image'];
@@ -46,6 +55,19 @@ class Buku extends Model
             'search' => self::$is_search,
             default => [],
         };
+    }
+
+    public static function getValidationRules($type)
+    {
+        $allowedFields = self::getAllowedFields($type);
+        $rules = [];
+
+        foreach ($allowedFields as $field) {
+            if (isset(self::$rules[$field])) {
+                $rules[$field] = self::$rules[$field];
+            }
+        }
+        return $rules;
     }
 
     // public function scopeIsFilter(Builder $query, array $filters = [])

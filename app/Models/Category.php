@@ -35,6 +35,12 @@ class Category extends Model
     //     return $query->where('name', 'LIKE', '%' . $search . '%');
     // }
 
+    protected static $rules = [ 
+        'name' => 'required|string|max:255',
+        'description' => 'nullable|string|max:255', 
+    ];
+
+
     protected static $is_add = ['name', 'description'];
     protected static $is_edit = ['name', 'description']; 
     protected static $is_delete = ['name', 'description'];
@@ -50,6 +56,19 @@ class Category extends Model
             'search' => self::$is_search,
             default => [],
         };
+    }
+
+    public static function getValidationRules($type)
+    {
+        $allowedFields = self::getAllowedFields($type);
+        $rules = [];
+
+        foreach ($allowedFields as $field) {
+            if (isset(self::$rules[$field])) {
+                $rules[$field] = self::$rules[$field];
+            }
+        }
+        return $rules;
     }
 
     // public function scopeSearch(Builder $query, $search)

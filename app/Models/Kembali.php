@@ -19,9 +19,17 @@ class Kembali extends Model
         'denda'
     ];
 
-    protected static $is_add = ['id_buku', 'id_user', 'id_pinjam', 'tgl_kembali', 'tgl_pinjam', 'denda'];
+    protected static $rules = [ 
+        'id_buku' => 'required|exists:bukus,id',
+        'id_user' => 'required|exists:users,id', 
+        'id_pinjam' => 'required|exists:pinjams,id',
+        'tgl_kembali' => 'required|date',
+        'denda' => 'nullable|decimal', 
+    ];
+
+    protected static $is_add = ['id_buku', 'id_user', 'id_pinjam', 'tgl_kembali', 'denda'];
     protected static $is_edit = ['denda']; 
-    protected static $is_delete = ['id_buku', 'id_user', 'id_pinjam', 'tgl_kembali', 'tgl_pinjam', 'denda'];
+    protected static $is_delete = ['id_buku', 'id_user', 'id_pinjam', 'tgl_kembali', 'denda'];
     protected static $is_filter = ['denda'];
     protected static $is_search = ['id_buku', 'id_user'];
     
@@ -36,6 +44,19 @@ class Kembali extends Model
             'search' => self::$is_search,
             default => [],
         };
+    }
+
+    public static function getValidationRules($type)
+    {
+        $allowedFields = self::getAllowedFields($type);
+        $rules = [];
+
+        foreach ($allowedFields as $field) {
+            if (isset(self::$rules[$field])) {
+                $rules[$field] = self::$rules[$field];
+            }
+        }
+        return $rules;
     }
 
     // public function scopeSearch(Builder $query, $search)
