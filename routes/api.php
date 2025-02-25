@@ -18,12 +18,14 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('profil/pinjam',[BukuController::class,'pinjam']);
     Route::get('buku/recently-read',[BukuController::class,'recentlyRead']);
     
-    //admin
-    Route::middleware('is_admin')->group(function(){
-        Route::post('{model}/create',[BaseController::class,'store']);
+    //nanti pindahkan ke middleware is admin
+    Route::post('{model}/create',[BaseController::class,'store']);
         Route::post('{model}/{id}/denda',[BaseController::class,'denda']);
         Route::put('{model}/{id}/update',[BaseController::class,'update']);
         Route::delete('{model}/{id}/delete',[BaseController::class,'destroy']);
+    //admin
+    Route::middleware('is_admin')->group(function(){
+        
     });
 });
 

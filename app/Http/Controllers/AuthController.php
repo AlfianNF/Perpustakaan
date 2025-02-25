@@ -25,6 +25,8 @@ class AuthController extends Controller
             'password' => Hash::make($validated['password']),
             'is_admin' => false, 
         ]);
+        
+        $token = $user->createToken('auth_token')->plainTextToken;
 
 
         return response()->json([
@@ -32,6 +34,7 @@ class AuthController extends Controller
             'message' => 'User berhasil dibuat',
             'data' => [
                 'user' => $user,
+                'token' => $token
             ],
         ], 201);
     }
