@@ -5,17 +5,21 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Services\CoreService;
+use App\Http\Services\QueryService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Database\QueryException;
 
 class BaseController extends Controller
 {
-    protected $coreService;
+    // protected $coreService;
+    // protected $queryService;
 
-    public function __construct(CoreService $coreService){
-        $this->coreService = $coreService;
-    }
+    // public function __construct(CoreService $coreService,QueryService $queryService){
+    //     $this->coreService = $coreService;
+    //     $this->queryService = $queryService;
+    // }
     public function is_admin(){
         $user = auth()->user();
 
@@ -59,43 +63,57 @@ class BaseController extends Controller
     //     return response()->json($data, 200);
     // }
 
-    public function isList($model)
-    {
-        $table = Str::snake(Str::plural($model)); 
+    // public function isList($model)
+    // {
+    //     $table = Str::snake(Str::plural($model)); 
     
-        if (!Schema::hasTable($table)) {
-            return response()->json(['message' => 'Table not found'], 404);
-        }
+    //     if (!Schema::hasTable($table)) {
+    //         return response()->json(['message' => 'Table not found'], 404);
+    //     }
     
-        $columns = Schema::getColumnListing($table);
+    //     $columns = Schema::getColumnListing($table);
     
-        return response()->json([
-            'model' => $model,
-            'table' => $table,
-            'columns' => $columns
-        ], 200);
-    }
+    //     return response()->json([
+    //         'model' => $model,
+    //         'table' => $table,
+    //         'columns' => $columns
+    //     ], 200);
+    // }
     
+
+    // public function index($model, Request $request)
+    // {
+    //     $baseModel = $this->getModel($model);
+    //     $baseController = $this->getController($model);
+
+    //     if (!class_exists($baseModel)) {
+    //         return response()->json(['message' => 'Model not found'], 404);
+    //     }
+
+    //     $controller = app()->make($baseController);
+
+    //     $response = app()->call([$controller, 'index'], ['request' => $request]);
+
+    //     // Paginate hasil query
+    //     $data = $response->paginate(21);
+
+    //     return response()->json($data, 200);
+    // }
 
     public function index($model, Request $request)
     {
-        $baseModel = $this->getModel($model);
-        $baseController = $this->getController($model);
+        $query = app(QueryService::class)->getQuery($model, $request);
+        $results = $query->paginate(21); 
+        return response()->json([
+            "message" =>"Data Ditemukan",
+            "data" => $results
+        ], 200);
 
-        if (!class_exists($baseModel)) {
-            return response()->json(['message' => 'Model not found'], 404);
-        }
+        // $query = $this->queryService->getQuery($model, $request);
+        // return app(QueryService::class)->getQuery($model, $request);
 
-        $controller = app()->make($baseController);
-
-        $response = app()->call([$controller, 'index'], ['request' => $request]);
-
-        // Paginate hasil query
-        $data = $response->paginate(21);
-
-        return response()->json($data, 200);
+        // return response()->json($query->paginate(21), 200);
     }
-
 
 
     public function show($model, $id){
@@ -198,45 +216,33 @@ class BaseController extends Controller
     {
         $this->is_admin();
         $baseModel = $this->getModel($model);
-
+    
         if (!class_exists($baseModel)) {
             return response()->json(['message' => 'Model not found'], 404);
         }
-
-        $allowedFields = $baseModel::getAllowedFields('delete'); 
-        $isListResponse = $this->isList($model); 
-
-        if ($isListResponse->getStatusCode() !== 200) {
-            return $isListResponse; 
-        }
-
-        $isListColumns = $isListResponse->getData(true)['columns'];
-
-        $data = $baseModel::find($id);
-
-        if (!$data) {
+    
+        $book = $baseModel::find($id);
+    
+        if (!$book) {
             return response()->json(['message' => 'Data tidak ditemukan'], 404);
         }
-
-        foreach ($allowedFields as $field) {
-            if (!isset($data->$field)) {
-                return response()->json(['message' => 'Tidak diizinkan menghapus field ini'], 400);
-            }
+    
+        try {
+            DB::beginTransaction(); // Start a database transaction for safety
+    
+            // 1. Delete related pinjams records:
+            $book->peminjaman()->delete(); // Use the relationship method
+    
+            // 2. Now delete the book:
+            $book->delete();
+    
+            DB::commit(); // Commit the transaction
+            return response()->json(['message' => 'Data berhasil dihapus'], 200);
+    
+        } catch (QueryException $e) {
+            DB::rollBack(); 
+            return response()->json(['message' => 'Error deleting data. Related loans may exist.'], 500); // More user-friendly message
         }
-
-        if (!empty($isListColumns)) {
-            foreach ($isListColumns as $column) {
-                if (!isset($data->$column)) {
-                    return response()->json(['message' => 'Data ini tidak ditemukan di daftar kolom'], 400);
-                }
-            }
-        }
-
-        dd($data);
-
-        $data->delete(); 
-
-        return response()->json(['message' => 'Data berhasil dihapus'], 200);
     }
 
 

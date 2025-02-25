@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -46,6 +47,21 @@ class UserController extends Controller
 
         // Validasi hanya field yang diperbolehkan
         $validatedData = $request->only($allowedFields);
+
+        if ($request->hasFile('image')) {
+            $request->validate([
+                'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048' // Maksimal 2MB
+            ]);
+
+            // Hapus gambar lama jika ada
+            if ($user->image) {
+                Storage::disk('public')->delete($user->image);
+            }
+
+            // Simpan gambar baru
+            $validatedData['image'] = $request->file('image')->store('images/user', 'public');
+        }
+
 
         // Jika tidak ada data yang valid, kembalikan error
         if (empty($validatedData)) {

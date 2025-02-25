@@ -13,7 +13,7 @@ use App\Http\Controllers\BukuController;
 Route::middleware('auth:sanctum')->group(function(){
     Route::get('{model}/list',[BaseController::class,'index']);
     Route::get('{model}/{id}/show',[BaseController::class,'show']);
-    Route::get('{model}/is-list', [BaseController::class, 'isList']);
+    // Route::get('{model}/is-list', [BaseController::class, 'isList']);
 
     Route::get('profil/pinjam',[BukuController::class,'pinjam']);
     Route::get('buku/recently-read',[BukuController::class,'recentlyRead']);

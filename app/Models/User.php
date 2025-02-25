@@ -25,7 +25,8 @@ class User extends Authenticatable
         'password',
         'no_induk',
         'email',
-        'is_admin'
+        'is_admin',
+        'image'
     ];
 
     // public function setIsAdminAttribute($value)
@@ -56,11 +57,20 @@ class User extends Authenticatable
         ];
     }
 
-    protected static $is_add = ['name', 'no_induk', 'no_hp', 'is_admin'];
-    protected static $is_edit = ['name', 'no_induk', 'no_hp', 'is_admin']; 
-    protected static $is_delete = ['name', 'no_induk', 'no_hp', 'is_admin'];
+    protected static $is_add = ['name', 'no_induk', 'no_hp', 'is_admin','image'];
+    protected static $is_edit = ['name', 'no_induk', 'no_hp', 'is_admin','image']; 
+    protected static $is_delete = ['name', 'no_induk', 'no_hp', 'is_admin','image'];
     protected static $is_filter = ['name','is_admin'];
     
+
+    protected static $rules = [ // Validation rules
+        'name' => 'required|string|max:255',
+        'no_induk' => 'required|string|unique:users,no_induk', // Example unique rule
+        'no_hp' => 'nullable',
+        'is_admin' => 'nullable',
+        'image' => 'nullable'
+    ];
+
 
     // public function scopeIsFilter(Builder $query){
     //     return $query->with(['category:id,name,description'],['peminjaman:id,'])
@@ -77,6 +87,19 @@ class User extends Authenticatable
             'filter' => self::$is_filter,
             default => [],
         };
+    }
+
+    public static function getValidationRules($type)
+    {
+        $allowedFields = self::getAllowedFields($type);
+        $rules = [];
+
+        foreach ($allowedFields as $field) {
+            if (isset(self::$rules[$field])) {
+                $rules[$field] = self::$rules[$field];
+            }
+        }
+        return $rules;
     }
 
     // public function scopeSearch(Builder $query, $search)
