@@ -29,7 +29,7 @@ class Buku extends Model
         'author' => 'required|string|max:255',
         'publish_date' => 'required|date',
         'category' => 'required|exists:categories,id', // Ensure category exists
-        'nullable|image|mimes:png,jpg,jpeg|max:2048'
+        'image'=> 'nullable|image|mimes:png,jpg,jpeg|max:2048',
     ];
 
     protected static $is_add = ['title', 'isbn', 'author', 'publish_date', 'category','image'];
