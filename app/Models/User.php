@@ -57,16 +57,16 @@ class User extends Authenticatable
         ];
     }
 
-    protected static $is_add = ['name', 'no_induk', 'no_hp', 'is_admin','image'];
-    protected static $is_edit = ['name', 'no_induk', 'no_hp', 'is_admin','image']; 
-    protected static $is_delete = ['name', 'no_induk', 'no_hp', 'is_admin','image'];
+    protected static $is_add = ['name', 'no_induk', 'email', 'is_admin','image'];
+    protected static $is_edit = ['name', 'email', 'is_admin','image']; 
+    protected static $is_delete = ['name', 'no_induk', 'email', 'is_admin','image'];
     protected static $is_filter = ['name','is_admin'];
     
 
     protected static $rules = [ // Validation rules
         'name' => 'required|string|max:255',
-        'no_induk' => 'required|string|unique:users,no_induk', // Example unique rule
-        'no_hp' => 'nullable',
+        'no_induk' => 'required|string|unique:users,no_induk', 
+        'email' => 'nullable',
         'is_admin' => 'nullable',
         'image' => 'nullable'
     ];
@@ -89,7 +89,7 @@ class User extends Authenticatable
         };
     }
 
-    public static function getValidationRules($type)
+    public static function getValidationRules($type,$userId = null)
     {
         $allowedFields = self::getAllowedFields($type);
         $rules = [];
@@ -98,6 +98,12 @@ class User extends Authenticatable
             if (isset(self::$rules[$field])) {
                 $rules[$field] = self::$rules[$field];
             }
+        }
+
+        if ($type === 'add') {
+            $rules['no_induk'] = 'required|string|unique:users,no_induk';
+        } else if ($type === 'edit') {
+            $rules['no_induk'] = 'nullable|string|unique:users,no_induk,' . $userId; 
         }
         return $rules;
     }

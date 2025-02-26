@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -34,7 +35,6 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
-        // Cari data berdasarkan ID
         $user = User::find($id);
 
         if (!$user) {
@@ -47,6 +47,16 @@ class UserController extends Controller
 
         // Validasi hanya field yang diperbolehkan
         $validatedData = $request->only($allowedFields);
+
+        // Logika untuk no_induk
+        if (!$request->filled('no_induk')) {  // Jika no_induk tidak diisi di request
+            $validatedData['no_induk'] = $user->no_induk; // Gunakan no_induk yang lama
+        } else { // Jika no_induk diisi, validasi seperti biasa
+          $rules = User::getValidationRules('edit');
+          $request->validate( [
+            'no_induk' => $rules['no_induk']
+          ]);
+        }
 
         if ($request->hasFile('image')) {
             $request->validate([
