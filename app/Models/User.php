@@ -65,7 +65,7 @@ class User extends Authenticatable
 
     protected static $rules = [ // Validation rules
         'name' => 'required|string|max:255',
-        'no_induk' => 'required|string|unique:users,no_induk', 
+        'no_induk' => 'required|unique:users,no_induk', 
         'email' => 'nullable',
         'password' => 'required|string|min:8',
         'is_admin' => 'nullable',
@@ -102,9 +102,10 @@ class User extends Authenticatable
         }
 
         if ($type === 'add') {
-            $rules['no_induk'] = 'required|string|unique:users,no_induk';
+            $rules['no_induk'] = 'required|unique:users,no_induk';
         } else if ($type === 'edit') {
-            $rules['no_induk'] = 'nullable|string|unique:users,no_induk,' . $userId; 
+            $rules['no_induk'] = 'nullable|unique:users,no_induk,' . $userId;
+            $rules['password'] = 'nullable|string|min:8'; 
         }
         return $rules;
     }
