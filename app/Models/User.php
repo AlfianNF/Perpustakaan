@@ -57,9 +57,9 @@ class User extends Authenticatable
         ];
     }
 
-    protected static $is_add = ['name', 'no_induk', 'email', 'is_admin','image'];
-    protected static $is_edit = ['name', 'email', 'is_admin','image']; 
-    protected static $is_delete = ['name', 'no_induk', 'email', 'is_admin','image'];
+    protected static $is_add = ['name', 'no_induk', 'email', 'is_admin','image','password'];
+    protected static $is_edit = ['name', 'email', 'is_admin','image','password']; 
+    protected static $is_delete = ['name', 'no_induk', 'email', 'is_admin','image','password'];
     protected static $is_filter = ['name','is_admin'];
     
 
@@ -67,6 +67,7 @@ class User extends Authenticatable
         'name' => 'required|string|max:255',
         'no_induk' => 'required|string|unique:users,no_induk', 
         'email' => 'nullable',
+        'password' => 'required|string|min:8',
         'is_admin' => 'nullable',
         'image' => 'nullable'
     ];

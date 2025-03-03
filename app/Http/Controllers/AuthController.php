@@ -2,66 +2,98 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'no_induk' => 'required|unique:users,no_induk',
-            'email' => 'required|email',
-            'password' => 'required|string|min:8',
-        ]);
+        try {
+            $rules = User::getValidationRules('add');
+            $validator = Validator::make($request->all(), $rules);
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'no_induk' => $validated['no_induk'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'is_admin' => false, 
-        ]);
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'User berhasil dibuat',
-            'data' => [
-                'user' => $user,
-            ],
-        ], 201);
+            $data = $request->all();
+            $data['password'] = Hash::make($data['password']); // Hash password
+
+            $user = User::create($data);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'User berhasil dibuat.',
+                'data' => $user,
+            ], 201);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (QueryException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan pada database.',
+                'error' => $e->getMessage(),
+            ], 500);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan server.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'no_induk' => 'required',
-            'password' => 'required|string',
-        ]);
+        try {
+            $credentials = $request->validate([
+                'no_induk' => 'required',
+                'password' => 'required|string',
+            ]);
 
-        if (!Auth::attempt($credentials)) {
+            if (!Auth::attempt($credentials)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid login credentials.',
+                ], 401);
+            }
+
+            $user = Auth::user();
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            return response()->json([
+                'success' => true,
+                'message' => 'User berhasil login',
+                'data' => [
+                    'user' => $user,
+                    'token' => $token,
+                ],
+            ]);
+        } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid login credentials.',
-            ], 401);
+                'message' => 'Validasi gagal.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan server.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-
-        $user = Auth::user();
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'success' => true,
-            'message' => 'User berhasil login',
-            'data' => [
-                'user' => $user,
-                'token' => $token,
-            ],
-        ]);
     }
 
     public function logout(Request $request)
