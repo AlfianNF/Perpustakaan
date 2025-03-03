@@ -57,7 +57,7 @@ class Buku extends Model
         };
     }
 
-    public static function getValidationRules($type)
+    public static function getValidationRules($type,$bukuId = null)
     {
         $allowedFields = self::getAllowedFields($type);
         $rules = [];
@@ -67,6 +67,13 @@ class Buku extends Model
                 $rules[$field] = self::$rules[$field];
             }
         }
+
+        if ($type === 'add') {
+            $rules['isbn'] = 'required|string|max:20|unique:bukus,isbn';
+        } elseif ($type === 'edit') {
+            $rules['isbn'] = 'nullable|string|max:20|unique:bukus,isbn,' . $bukuId;
+        }
+
         return $rules;
     }
 

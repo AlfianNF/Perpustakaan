@@ -4,6 +4,7 @@ namespace App\Http\Services;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Validator;
 
 class CoreService
@@ -50,19 +51,25 @@ class CoreService
             }
 
             if ($model === 'kembali' && $action === 'store') {
-                $pinjam = \App\Models\Pinjam::find($requestData['id_pinjam']);
-    
+                $pinjam = \App\Models\Pinjam::where('id', $requestData['id_pinjam'])
+                    ->where('status', 'dipinjam')
+                    ->first();
+
                 if (!$pinjam) {
-                    return response()->json(['message' => 'Data peminjaman tidak ditemukan'], 404);
+                    $pinjamCheck = \App\Models\Pinjam::find($requestData['id_pinjam']);
+                    if ($pinjamCheck && $pinjamCheck->status == 'dikembalikan') {
+                        throw new \Exception("Peminjaman sudah dikembalikan sebelumnya.");
+                    }
+                    return response()->json(['message' => 'Data peminjaman tidak ditemukan atau sudah dikembalikan'], 404);
                 }
-    
+
                 // Hitung denda jika terlambat
                 $tgl_kembali_input = \Carbon\Carbon::parse($requestData['tgl_kembali']);
                 $tgl_kembali_pinjam = \Carbon\Carbon::parse($pinjam->tgl_kembali);
                 $denda = $tgl_kembali_input->greaterThan($tgl_kembali_pinjam)
                     ? $tgl_kembali_pinjam->diffInDays($tgl_kembali_input) * 1000
                     : 0;
-    
+
                 // Simpan data pengembalian
                 $requestData['denda'] = $denda;
             }
@@ -74,7 +81,6 @@ class CoreService
 
                 $requestData['image'] = $imagePath; // Store the *path* in the database
             }
-
 
             if ($action === 'store') {
                 $modelInstance = new $baseModel();
@@ -111,6 +117,36 @@ class CoreService
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['message' => 'Failed to process request: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function deleteModel($model, $id)
+    {
+        $baseModel = $this->getModel($model);
+
+        if (!class_exists($baseModel)) {
+            return response()->json(['message' => 'Model not found'], 404);
+        }
+
+        $allowedFields = (new $baseModel)->getAllowedFields('delete');
+        $data = $baseModel::find($id);
+
+        if (!$data) {
+            return response()->json(['message' => 'Data not found'], 404);
+        }
+
+        $filteredData = $data->only($allowedFields);
+        if (empty($filteredData)) {
+            return response()->json(['message' => 'Tidak ada field yang dapat dihapus'], 400);
+        }
+
+        try {
+            $data->delete();
+            return response()->json(['message' => 'Data berhasil dihapus'], 200);
+        } catch (QueryException $e) {
+            return response()->json(['message' => 'Error deleting data. Related data may exist.'], 500);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Terjadi kesalahan server: ' . $e->getMessage()], 500);
         }
     }
 }

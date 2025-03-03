@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use App\Models\Buku;
 use App\Models\Pinjam;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class PinjamController extends Controller
 {
@@ -99,84 +103,99 @@ class PinjamController extends Controller
 
     public function store(Request $request)
     {
-        // Ambil field yang diperbolehkan untuk input ('add')
-        $allowedFields = Pinjam::getAllowedFields('add');
-
-        // Validasi hanya untuk field yang diperbolehkan
-        $validated = $request->only($allowedFields);
-
-        // Lakukan validasi tambahan sebelum penyimpanan
-        $request->validate([
-            'id_buku' => 'required',
-            'id_user' => 'required',
-            'tgl_pinjam' => 'required|date',
-            'tgl_kembali' => 'required|date',
-        ]);
-
-        // Cek apakah buku tersedia
-        $buku = Buku::find($validated['id_buku']);
-
-        if (!$buku) {
-            return response()->json(['message' => 'Buku tidak ditemukan'], 404);
-        }
-
-        if ($buku->is_pinjam) {
-            return response()->json(['message' => 'Buku ini sedang dipinjam, peminjaman dibatalkan'], 400);
-        }
-
-        // Mulai transaksi database
-        DB::beginTransaction();
-
         try {
-            // Simpan data peminjaman
+            $rules = Pinjam::getValidationRules('add');
+            $validator = Validator::make($request->all(), $rules);
+
+            if ($validator->fails()) {
+                throw new ValidationException($validator); 
+            }
+
+            $validated = $validator->validated(); 
+
+            $buku = Buku::find($validated['id_buku']);
+
+            if (!$buku) {
+                return response()->json(['message' => 'Buku tidak ditemukan'], 404);
+            }
+
+            if ($buku->is_pinjam) {
+                return response()->json(['message' => 'Buku ini sedang dipinjam, peminjaman dibatalkan'], 400);
+            }
+
+            DB::beginTransaction();
+
             $pinjam = Pinjam::create($validated);
 
-            // Update status buku agar is_pinjam menjadi true
             $buku->update(['is_pinjam' => true]);
 
-            // Commit transaksi
             DB::commit();
 
             return response()->json([
                 'message' => 'Peminjaman berhasil dicatat',
                 'data' => $pinjam
             ], 201);
-
-        } catch (\Exception $e) {
-            // Rollback jika terjadi error
+        } catch (ValidationException $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (QueryException $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan pada database.',
+                'error' => $e->getMessage(),
+            ], 500);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan server.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
     }
 
 
+
     public function update(Request $request, $id)
     {
-        // Cari data berdasarkan ID
-        $pinjam = Pinjam::find($id);
+        try {
+            $pinjam = Pinjam::find($id);
 
-        if (!$pinjam) {
-            return response()->json(['message' => 'Data tidak ditemukan'], 404);
+            if (!$pinjam) {
+                return response()->json(['message' => 'Data tidak ditemukan'], 404);
+            }
+
+            $allowedFields = Pinjam::getAllowedFields('edit');
+            $validatedData = $request->only($allowedFields);
+
+            if (empty($validatedData)) {
+                return response()->json(['message' => 'Tidak ada field yang diperbarui'], 400);
+            }
+
+            $pinjam->update($validatedData);
+
+            return response()->json([
+                'message' => 'Data berhasil diperbarui',
+                'data' => $pinjam
+            ], 200);
+        } catch (QueryException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan pada database.',
+                'error' => $e->getMessage(),
+            ], 500);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan server.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-
-        // Ambil field yang boleh diedit dari model
-        $allowedFields = Pinjam::getAllowedFields('edit');
-
-        // Validasi hanya field yang diperbolehkan
-        $validatedData = $request->only($allowedFields);
-
-        // Jika tidak ada data yang valid, kembalikan error
-        if (empty($validatedData)) {
-            return response()->json(['message' => 'Tidak ada field yang diperbarui'], 400);
-        }
-
-        // Lakukan update hanya dengan data yang valid
-        $pinjam->update($validatedData);
-
-        return response()->json([
-            'message' => 'Data berhasil diperbarui',
-            'data' => $pinjam
-        ], 200);
     }
 
 }

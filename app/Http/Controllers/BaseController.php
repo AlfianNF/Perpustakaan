@@ -215,34 +215,25 @@ class BaseController extends Controller
     public function destroy($model, $id)
     {
         $this->is_admin();
-        $baseModel = $this->getModel($model);
-    
-        if (!class_exists($baseModel)) {
-            return response()->json(['message' => 'Model not found'], 404);
-        }
-    
-        $book = $baseModel::find($id);
-    
-        if (!$book) {
-            return response()->json(['message' => 'Data tidak ditemukan'], 404);
-        }
-    
-        try {
-            DB::beginTransaction(); // Start a database transaction for safety
-    
-            // 1. Delete related pinjams records:
-            $book->peminjaman()->delete(); // Use the relationship method
-    
-            // 2. Now delete the book:
-            $book->delete();
-    
-            DB::commit(); // Commit the transaction
-            return response()->json(['message' => 'Data berhasil dihapus'], 200);
-    
-        } catch (QueryException $e) {
-            DB::rollBack(); 
-            return response()->json(['message' => 'Error deleting data. Related loans may exist.'], 500); // More user-friendly message
-        }
+        return app(CoreService::class)->deleteModel($model, $id);
+        // $baseModel = $this->getModel($model);
+        // if(!class_exists($baseModel)){
+        //     return response()->json(['message' => 'Model not found'], 404);
+        // }
+
+        // $allowedFields = (new $baseModel)->getAllowedFields('delete');
+        // $data = (new $baseModel)::find($id);
+
+        // if (!$data) {
+        //     return response()->json(['message' => 'Data not found'], 404);
+        // }
+
+        // $filteredData = $data->only($allowedFields);
+        // if (empty($filteredData)) {
+        //     return response()->json(['message' => 'Tidak ada field yang dapat dihapus'], 400);
+        // }
+
+        // $data->delete();
     }
 
 

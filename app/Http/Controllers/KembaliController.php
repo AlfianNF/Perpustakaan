@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use Carbon\Carbon;
 use App\Models\Buku;
 use App\Models\Pinjam;
 use App\Models\Kembali;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class KembaliController extends Controller
 {
@@ -140,39 +144,39 @@ class KembaliController extends Controller
 
     public function store(Request $request)
     {
-        // Ambil field yang diperbolehkan untuk input ('add')
-        $allowedFields = Kembali::getAllowedFields('add');
-
-        // Definisikan aturan validasi
-        $rules = [
-            'id_buku' => 'required',
-            'id_user' => 'required',
-            'id_pinjam' => 'required',
-            'tgl_kembali' => 'required|date',
-        ];
-
-        // Validasi hanya field yang diperbolehkan
-        $validated = $request->validate(array_intersect_key($rules, array_flip($allowedFields)));
-
-        DB::beginTransaction();
-
         try {
+            $rules = Kembali::getValidationRules('add');
+            $validator = Validator::make($request->all(), $rules);
+            dd($validator);
+    
+            if ($validator->fails()) {
+                throw new ValidationException($validator);
+            }
+    
+            $validated = $validator->validated();
+    
+            DB::beginTransaction();
+    
             $pinjam = Pinjam::find($validated['id_pinjam']);
-
+    
             if (!$pinjam) {
                 return response()->json(['message' => 'Data peminjaman tidak ditemukan'], 404);
             }
-
+    
+            if ($pinjam->status == 'dikembalikan') {
+                throw new Exception("Peminjaman sudah dikembalikan sebelumnya.");
+            }
+    
             // Hitung denda jika terlambat
             $tgl_kembali_input = Carbon::parse($validated['tgl_kembali']);
             $tgl_kembali_pinjam = Carbon::parse($pinjam->tgl_kembali);
-            $denda = $tgl_kembali_input->greaterThan($tgl_kembali_pinjam) 
-                ? $tgl_kembali_pinjam->diffInDays($tgl_kembali_input) * 1000 
+            $denda = $tgl_kembali_input->greaterThan($tgl_kembali_pinjam)
+                ? $tgl_kembali_pinjam->diffInDays($tgl_kembali_input) * 1000
                 : 0;
-
+    
             // Simpan data pengembalian
             $kembali = Kembali::create(array_merge($validated, ['denda' => $denda]));
-
+    
             // Update status buku
             if ($buku = Buku::find($validated['id_buku'])) {
                 $buku->update(['is_pinjam' => false]);
@@ -180,19 +184,35 @@ class KembaliController extends Controller
                 DB::rollBack();
                 return response()->json(['message' => 'Buku tidak ditemukan'], 404);
             }
-
+    
             $pinjam->update(['status' => 'dikembalikan']);
-
+    
             DB::commit();
-
+    
             return response()->json([
                 'message' => 'Pengembalian berhasil',
                 'data' => $kembali
             ], 201);
-
-        } catch (\Exception $e) {
+        } catch (ValidationException $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (QueryException $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan pada database.',
+                'error' => $e->getMessage(),
+            ], 500);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+            ], 500);
         }
     }
 
