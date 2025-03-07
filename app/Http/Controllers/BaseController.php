@@ -107,7 +107,7 @@ class BaseController extends Controller
         return response()->json([
             "message" =>"Data Ditemukan",
             "data" => $results
-        ], 200);
+        ], 200); 
 
         // $query = $this->queryService->getQuery($model, $request);
         // return app(QueryService::class)->getQuery($model, $request);
@@ -117,19 +117,14 @@ class BaseController extends Controller
 
 
     public function show($model, $id){
-        $baseModel = $this->getModel($model);
-        if(!class_exists($baseModel)){
-            return response()->json(['message' => 'Model not found'], 404);
-        }
-        
-        $relations = (new $baseModel)->getRelations();
+        $baseModel = $this->getModel($model); 
+        $data = app(QueryService::class)->getShow($baseModel, $id);
 
-        $data = $baseModel::with($relations)->find($id);
-
-        if($data == null){
+        if ($data === null) {
             return response()->json(['message' => 'Data not found'], 404);
         }
-        return response()->json($data,200);
+
+        return response()->json($data, 200);
     }
 
     public function store($model, Request $request)
@@ -215,25 +210,7 @@ class BaseController extends Controller
     public function destroy($model, $id)
     {
         $this->is_admin();
-        return app(CoreService::class)->deleteModel($model, $id);
-        // $baseModel = $this->getModel($model);
-        // if(!class_exists($baseModel)){
-        //     return response()->json(['message' => 'Model not found'], 404);
-        // }
-
-        // $allowedFields = (new $baseModel)->getAllowedFields('delete');
-        // $data = (new $baseModel)::find($id);
-
-        // if (!$data) {
-        //     return response()->json(['message' => 'Data not found'], 404);
-        // }
-
-        // $filteredData = $data->only($allowedFields);
-        // if (empty($filteredData)) {
-        //     return response()->json(['message' => 'Tidak ada field yang dapat dihapus'], 400);
-        // }
-
-        // $data->delete();
+        return app(CoreService::class)->destroy($model, $id);
     }
 
 

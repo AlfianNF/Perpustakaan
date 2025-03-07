@@ -2,6 +2,7 @@
 
 namespace App\Http\Services;
 
+use Exception;
 use App\Models\Buku;
 use App\Models\User;
 use App\Models\Pinjam;
@@ -42,7 +43,6 @@ class QueryService
             }
     
             $query = $modelClass::query();
-    
             $method = Str::camel($model) . 'Query';
     
             if (method_exists($this, $method)) {
@@ -156,5 +156,17 @@ class QueryService
         }
 
         return $query->with((new Pinjam)->getRelations())->orderBy('created_at', 'DESC');
+    }
+
+    public function getShow(string $modelClass, int $id)
+    {
+        try{
+            $baseModel = new $modelClass();
+            $relations = $baseModel->getRelations();
+    
+            return $modelClass::with($relations)->find($id);
+        }catch(Exception $e){
+            throw new Exception($e->getMessage());
+        }
     }
 }

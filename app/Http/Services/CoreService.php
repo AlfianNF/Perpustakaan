@@ -2,6 +2,9 @@
 
 namespace App\Http\Services;
 
+use Carbon\Carbon;
+use App\Models\Buku;
+use App\Models\Pinjam;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\QueryException;
@@ -27,11 +30,9 @@ class CoreService
         $allowedFields = $baseModel::getAllowedFields($type);
         $rules = $baseModel::getValidationRules($type);
 
-        // Filter request data to only include allowed fields *before* validation
         $requestData = $request->only($allowedFields);
 
-        $validator = Validator::make($requestData, $rules); // Validate the *filtered* data
-
+        $validator = Validator::make($requestData, $rules); 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 400);
         }
@@ -40,7 +41,7 @@ class CoreService
             DB::beginTransaction();
 
             if ($model === 'pinjam' && $action === 'store') {
-                $buku = \App\Models\Buku::find($requestData['id_buku']);
+                $buku = Buku::find($requestData['id_buku']);
 
                 if (!$buku) {
                     return response()->json(['message' => 'Buku tidak ditemukan'], 404);
@@ -51,26 +52,24 @@ class CoreService
             }
 
             if ($model === 'kembali' && $action === 'store') {
-                $pinjam = \App\Models\Pinjam::where('id', $requestData['id_pinjam'])
+                $pinjam = Pinjam::where('id', $requestData['id_pinjam'])
                     ->where('status', 'dipinjam')
                     ->first();
 
                 if (!$pinjam) {
-                    $pinjamCheck = \App\Models\Pinjam::find($requestData['id_pinjam']);
+                    $pinjamCheck = Pinjam::find($requestData['id_pinjam']);
                     if ($pinjamCheck && $pinjamCheck->status == 'dikembalikan') {
                         throw new \Exception("Peminjaman sudah dikembalikan sebelumnya.");
                     }
                     return response()->json(['message' => 'Data peminjaman tidak ditemukan atau sudah dikembalikan'], 404);
                 }
 
-                // Hitung denda jika terlambat
-                $tgl_kembali_input = \Carbon\Carbon::parse($requestData['tgl_kembali']);
-                $tgl_kembali_pinjam = \Carbon\Carbon::parse($pinjam->tgl_kembali);
+                $tgl_kembali_input = Carbon::parse($requestData['tgl_kembali']);
+                $tgl_kembali_pinjam = Carbon::parse($pinjam->tgl_kembali);
                 $denda = $tgl_kembali_input->greaterThan($tgl_kembali_pinjam)
                     ? $tgl_kembali_pinjam->diffInDays($tgl_kembali_input) * 1000
                     : 0;
 
-                // Simpan data pengembalian
                 $requestData['denda'] = $denda;
             }
 
@@ -79,21 +78,21 @@ class CoreService
                 $imageName = time() . '.' . $image->getClientOriginalExtension();
                 $imagePath = $image->storeAs('images/buku', $imageName, 'public');
 
-                $requestData['image'] = $imagePath; // Store the *path* in the database
+                $requestData['image'] = $imagePath; 
             }
 
             if ($action === 'store') {
                 $modelInstance = new $baseModel();
-                $modelInstance->fill($requestData); // Use the *filtered* $requestData
+                $modelInstance->fill($requestData);
                 $modelInstance->save();
 
                 if ($model === 'pinjam') {
-                    $buku = \App\Models\Buku::find($requestData['id_buku']); // Re-fetch Buku
-                    $buku->update(['is_pinjam' => true]); // Use update() with array
+                    $buku = Buku::find($requestData['id_buku']); 
+                    $buku->update(['is_pinjam' => true]);
                 }
 
                 if ($model === 'kembali') {
-                    $buku = \App\Models\Buku::find($requestData['id_buku']);
+                    $buku = Buku::find($requestData['id_buku']);
                     if ($buku) {
                         $buku->update(['is_pinjam' => false]);
                     }
@@ -101,12 +100,12 @@ class CoreService
                 }
 
                 $statusCode = 201;
-            } else { // update
+            } else {
                 $modelInstance = $baseModel::find($id);
                 if (!$modelInstance) {
                     return response()->json(['message' => 'Data not found'], 404);
                 }
-                $modelInstance->fill($requestData); // Use the *filtered* $requestData
+                $modelInstance->fill($requestData);
                 $modelInstance->save();
                 $statusCode = 200;
             }
@@ -120,7 +119,7 @@ class CoreService
         }
     }
 
-    public function deleteModel($model, $id)
+    public function destroy($model, $id)
     {
         $baseModel = $this->getModel($model);
 

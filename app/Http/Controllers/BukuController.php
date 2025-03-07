@@ -33,11 +33,9 @@ class BukuController extends Controller
     public function index(Request $request){
         $query = Buku::query();
         
-        // Menerapkan filter dari request
         $filters = $request->only(Buku::getAllowedFields('filter'));
 
         if (!empty($filters)) {
-            // Tangani filter 'category' terlebih dahulu jika ada
             if (isset($filters['category'])) {
                 $categoryValue = $filters['category'];
                 if (!empty($categoryValue)) {
@@ -45,30 +43,22 @@ class BukuController extends Controller
                         $q->whereRaw("LOWER(name) LIKE LOWER(?)", ["%{$categoryValue}%"]);
                     });
                 }
-                // Hapus filter 'category' dari array $filters agar tidak diproses lagi di loop
                 unset($filters['category']);
             }
         }
     
-        // Menerapkan search dari request
         $search = $request->input('search'); 
 
-        if ($search) { // Check if $search is not empty
+        if ($search) { 
             $allowedSearch = Buku::getAllowedFields('search');
-
             $query->where(function ($q) use ($search, $allowedSearch) {
-                foreach ($allowedSearch as $field) { // Iterate through allowed search fields
+                foreach ($allowedSearch as $field) { 
                     $q->orWhereRaw("LOWER($field) LIKE LOWER(?)", ["%{$search}%"]);
                 }
             });
-        }
-    
-        // Mengambil relasi jika ada
+        }   
         $query->with((new Buku)->getRelations());
-    
-        // Mengurutkan dan filter tambahan
         $query->orderByRaw('LENGTH(title), title')->where('is_pinjam', false);
-        // $query->orderBy('created_at', 'DESC')->where('is_pinjam', false);
 
         return $query;
     }
@@ -76,21 +66,16 @@ class BukuController extends Controller
 
     public function store(Request $request)
     {
-        // Ambil field yang boleh di-insert
         $allowedFields = Buku::getAllowedFields('add');
-
-        // Validasi hanya field yang diperbolehkan
         $validated = $request->only($allowedFields);
 
         if ($request->hasFile('image')) {
             $request->validate([
-                'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048' // Maksimal 2MB
+                'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
             ]);
     
-            // Simpan gambar ke storage/public/images/bukus
             $validated['image'] = $request->file('image')->store('images/buku', 'public');    
         }
-        // Simpan data ke database
         $buku = Buku::create($validated);
 
         return response()->json([
@@ -102,40 +87,27 @@ class BukuController extends Controller
 
     public function update(Request $request, $id)
     {
-        // Cari data berdasarkan ID
         $buku = Buku::find($id);
 
         if (!$buku) {
             return response()->json(['message' => 'Data tidak ditemukan'], 404);
         }
-
-        // Ambil field yang boleh diedit dari model
         $allowedFields = Buku::getAllowedFields('edit');
-
-        // Validasi hanya field yang diperbolehkan
         $validatedData = $request->only($allowedFields);
 
-        // Jika ada gambar baru yang diunggah
         if ($request->hasFile('image')) {
             $request->validate([
                 'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048' // Maksimal 2MB
             ]);
-
-            // Hapus gambar lama jika ada
             if ($buku->image) {
                 Storage::disk('public')->delete($buku->image);
             }
-
-            // Simpan gambar baru
             $validatedData['image'] = $request->file('image')->store('images/bukus', 'public');
         }
 
-        // Jika tidak ada data yang valid, kembalikan error
         if (empty($validatedData)) {
             return response()->json(['message' => 'Tidak ada field yang diperbarui'], 400);
         }
-
-        // Lakukan update hanya dengan data yang valid
         $buku->update($validatedData);
 
         return response()->json([
@@ -148,7 +120,7 @@ class BukuController extends Controller
                 'category' => $buku->category,
                 'publish_date' => $buku->publish_date,
                 'is_pinjam' => $buku->is_pinjam,
-                'image_url' => $buku->image ? asset('storage/' . $buku->image) : null // URL gambar
+                'image_url' => $buku->image ? asset('storage/' . $buku->image) : null 
             ]
         ], 200);
     }
