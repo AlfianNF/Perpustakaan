@@ -11,6 +11,13 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\QueryException;
 
+/**
+ * @OA\Info(
+ * title="API Documentation",
+ * version="1.0.0",
+ * description="Dokumentasi API untuk aplikasi Anda",
+ * )
+ */
 class BaseController extends Controller
 {
     // protected $coreService;
@@ -100,6 +107,34 @@ class BaseController extends Controller
     //     return response()->json($data, 200);
     // }
 
+    /**
+     * @OA\Get(
+     * path="/api/{model}/list",
+     * operationId="getList",
+     * tags={"Dynamic Routes"},
+     * summary="Mendapatkan daftar data dari model dinamis",
+     * description="Endpoint untuk mendapatkan daftar data dari model dinamis dengan paginasi.",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="model",
+     * in="path",
+     * required=true,
+     * description="Nama model (misalnya: buku, user)",
+     * @OA\Schema(type="string")
+     * ),
+     * @OA\Response(
+     * response=200,
+     * description="Data ditemukan",
+     * @OA\JsonContent(
+     * type="object",
+     * @OA\Property(property="message", type="string", example="Data Ditemukan"),
+     * @OA\Property(property="data", type="object")
+     * )
+     * ),
+     * @OA\Response(response=404, description="Data tidak ditemukan")
+     * )
+     */
+     
     public function index($model, Request $request)
     {
         $query = app(QueryService::class)->getQuery($model, $request);
@@ -116,6 +151,32 @@ class BaseController extends Controller
     }
 
 
+    /**
+     * @OA\Get(
+     * path="/api/{model}/{id}/show",
+     * operationId="getShow",
+     * tags={"Dynamic Routes"},
+     * summary="Mendapatkan detail data dari model dinamis",
+     * description="Endpoint untuk mendapatkan detail data berdasarkan ID dari model dinamis.",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="model",
+     * in="path",
+     * required=true,
+     * description="Nama model (misalnya: buku, user)",
+     * @OA\Schema(type="string")
+     * ),
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * required=true,
+     * description="ID data",
+     * @OA\Schema(type="integer")
+     * ),
+     * @OA\Response(response=200, description="Data ditemukan"),
+     * @OA\Response(response=404, description="Data tidak ditemukan")
+     * )
+     */
     public function show($model, $id){
         $baseModel = $this->getModel($model); 
         $data = app(QueryService::class)->getShow($baseModel, $id);
@@ -127,11 +188,73 @@ class BaseController extends Controller
         return response()->json($data, 200);
     }
 
+    /**
+     * @OA\Post(
+     * path="/api/{model}/create",
+     * operationId="createData",
+     * tags={"Dynamic Routes"},
+     * summary="Membuat data baru pada model dinamis",
+     * description="Endpoint untuk membuat data baru pada model dinamis.",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="model",
+     * in="path",
+     * required=true,
+     * description="Nama model (misalnya: buku, user)",
+     * @OA\Schema(type="string")
+     * ),
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\JsonContent(
+     * type="object",
+     * @OA\Property(property="field1", type="string", example="value1"),
+     * @OA\Property(property="field2", type="integer", example=123)
+     * )
+     * ),
+     * @OA\Response(response=201, description="Data berhasil dibuat"),
+     * @OA\Response(response=400, description="Validasi gagal")
+     * )
+     */
     public function store($model, Request $request)
     {
         return app(CoreService::class)->handleRequest($model, $request, null, 'store');
     }
 
+    /**
+     * @OA\Put(
+     * path="/api/{model}/{id}/update",
+     * operationId="updateData",
+     * tags={"Dynamic Routes"},
+     * summary="Memperbarui data pada model dinamis",
+     * description="Endpoint untuk memperbarui data pada model dinamis berdasarkan ID.",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="model",
+     * in="path",
+     * required=true,
+     * description="Nama model (misalnya: buku, user)",
+     * @OA\Schema(type="string")
+     * ),
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * required=true,
+     * description="ID data",
+     * @OA\Schema(type="integer")
+     * ),
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\JsonContent(
+     * type="object",
+     * @OA\Property(property="field1", type="string", example="updatedValue1"),
+     * @OA\Property(property="field2", type="integer", example=456)
+     * )
+     * ),
+     * @OA\Response(response=200, description="Data berhasil diperbarui"),
+     * @OA\Response(response=400, description="Validasi gagal"),
+     * @OA\Response(response=404, description="Data tidak ditemukan")
+     * )
+     */
     public function update($model, Request $request, $id)
     {
         return app(CoreService::class)->handleRequest($model, $request, $id, 'update');
@@ -207,13 +330,74 @@ class BaseController extends Controller
     //     return response()->json(['message' => 'Data berhasil dihapus'], 200);
     // }
 
+    /**
+     * @OA\Delete(
+     * path="/api/{model}/{id}/delete",
+     * operationId="deleteData",
+     * tags={"Dynamic Routes"},
+     * summary="Menghapus data dari model dinamis",
+     * description="Endpoint untuk menghapus data dari model dinamis berdasarkan ID.",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="model",
+     * in="path",
+     * required=true,
+     * description="Nama model (misalnya: buku, user)",
+     * @OA\Schema(type="string")
+     * ),
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * required=true,
+     * description="ID data",
+     * @OA\Schema(type="integer")
+     * ),
+     * @OA\Response(response=200, description="Data berhasil dihapus."),
+     * @OA\Response(response=404, description="Data tidak ditemukan."),
+     * @OA\Response(response=500, description="Terjadi kesalahan server.")
+     * )
+     */
     public function destroy($model, $id)
     {
         $this->is_admin();
         return app(CoreService::class)->destroy($model, $id);
     }
 
-
+    /**
+     * @OA\Post(
+     * path="/api/{model}/{id}/denda",
+     * operationId="bayarDenda",
+     * tags={"Dynamic Routes"},
+     * summary="Membayar denda pengembalian",
+     * description="Endpoint untuk membayar denda pengembalian buku.",
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(
+     * name="model",
+     * in="path",
+     * required=true,
+     * description="Nama model (harus 'kembali')",
+     * @OA\Schema(type="string")
+     * ),
+     * @OA\Parameter(
+     * name="id",
+     * in="path",
+     * required=true,
+     * description="ID pengembalian",
+     * @OA\Schema(type="integer")
+     * ),
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\JsonContent(
+     * type="object",
+     * @OA\Property(property="jumlah_bayar", type="number", format="float", example=5000)
+     * )
+     * ),
+     * @OA\Response(response=200, description="Pembayaran denda berhasil."),
+     * @OA\Response(response=400, description="Validasi gagal."),
+     * @OA\Response(response=404, description="Data tidak ditemukan."),
+     * @OA\Response(response=500, description="Terjadi kesalahan server.")
+     * )
+     */
     public function denda($model,Request $request,$id){
         $this->is_admin();
 

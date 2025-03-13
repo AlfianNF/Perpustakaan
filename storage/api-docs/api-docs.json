@@ -1,0 +1,440 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API Documentation",
+        "description": "Dokumentasi API untuk aplikasi Anda",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/register": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Register new user",
+                "operationId": "8a56853624e025573120a09a4c75d468",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "no_induk": {
+                                        "type": "string",
+                                        "example": "12345"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "john.doe@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    },
+                                    "is_admin": {
+                                        "type": "boolean",
+                                        "example": false
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User created successfully."
+                    },
+                    "422": {
+                        "description": "Validation failed."
+                    },
+                    "500": {
+                        "description": "Server error."
+                    }
+                }
+            }
+        },
+        "/api/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Login user",
+                "operationId": "a3b306d14572d1f4bd6c064b3233e7b8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "no_induk": {
+                                        "type": "string",
+                                        "example": "12345"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login successful."
+                    },
+                    "401": {
+                        "description": "Invalid login credentials."
+                    },
+                    "422": {
+                        "description": "Validation failed."
+                    },
+                    "500": {
+                        "description": "Server error."
+                    }
+                }
+            }
+        },
+        "/api/{model}/list": {
+            "get": {
+                "tags": [
+                    "Dynamic Routes"
+                ],
+                "summary": "Mendapatkan daftar data dari model dinamis",
+                "description": "Endpoint untuk mendapatkan daftar data dari model dinamis dengan paginasi.",
+                "operationId": "getList",
+                "parameters": [
+                    {
+                        "name": "model",
+                        "in": "path",
+                        "description": "Nama model (misalnya: buku, user)",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Data ditemukan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Data Ditemukan"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/{model}/{id}/show": {
+            "get": {
+                "tags": [
+                    "Dynamic Routes"
+                ],
+                "summary": "Mendapatkan detail data dari model dinamis",
+                "description": "Endpoint untuk mendapatkan detail data berdasarkan ID dari model dinamis.",
+                "operationId": "getShow",
+                "parameters": [
+                    {
+                        "name": "model",
+                        "in": "path",
+                        "description": "Nama model (misalnya: buku, user)",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID data",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Data ditemukan"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/{model}/create": {
+            "post": {
+                "tags": [
+                    "Dynamic Routes"
+                ],
+                "summary": "Membuat data baru pada model dinamis",
+                "description": "Endpoint untuk membuat data baru pada model dinamis.",
+                "operationId": "createData",
+                "parameters": [
+                    {
+                        "name": "model",
+                        "in": "path",
+                        "description": "Nama model (misalnya: buku, user)",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "field1": {
+                                        "type": "string",
+                                        "example": "value1"
+                                    },
+                                    "field2": {
+                                        "type": "integer",
+                                        "example": 123
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Data berhasil dibuat"
+                    },
+                    "400": {
+                        "description": "Validasi gagal"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/{model}/{id}/update": {
+            "put": {
+                "tags": [
+                    "Dynamic Routes"
+                ],
+                "summary": "Memperbarui data pada model dinamis",
+                "description": "Endpoint untuk memperbarui data pada model dinamis berdasarkan ID.",
+                "operationId": "updateData",
+                "parameters": [
+                    {
+                        "name": "model",
+                        "in": "path",
+                        "description": "Nama model (misalnya: buku, user)",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID data",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "field1": {
+                                        "type": "string",
+                                        "example": "updatedValue1"
+                                    },
+                                    "field2": {
+                                        "type": "integer",
+                                        "example": 456
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Data berhasil diperbarui"
+                    },
+                    "400": {
+                        "description": "Validasi gagal"
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/{model}/{id}/delete": {
+            "delete": {
+                "tags": [
+                    "Dynamic Routes"
+                ],
+                "summary": "Menghapus data dari model dinamis",
+                "description": "Endpoint untuk menghapus data dari model dinamis berdasarkan ID.",
+                "operationId": "deleteData",
+                "parameters": [
+                    {
+                        "name": "model",
+                        "in": "path",
+                        "description": "Nama model (misalnya: buku, user)",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID data",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Data berhasil dihapus."
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan."
+                    },
+                    "500": {
+                        "description": "Terjadi kesalahan server."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/{model}/{id}/denda": {
+            "post": {
+                "tags": [
+                    "Dynamic Routes"
+                ],
+                "summary": "Membayar denda pengembalian",
+                "description": "Endpoint untuk membayar denda pengembalian buku.",
+                "operationId": "bayarDenda",
+                "parameters": [
+                    {
+                        "name": "model",
+                        "in": "path",
+                        "description": "Nama model (harus 'kembali')",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID pengembalian",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "jumlah_bayar": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 5000
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Pembayaran denda berhasil."
+                    },
+                    "400": {
+                        "description": "Validasi gagal."
+                    },
+                    "404": {
+                        "description": "Data tidak ditemukan."
+                    },
+                    "500": {
+                        "description": "Terjadi kesalahan server."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": "Authentication"
+        },
+        {
+            "name": "Dynamic Routes",
+            "description": "Dynamic Routes"
+        }
+    ]
+}

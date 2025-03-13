@@ -11,8 +11,30 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
+
 class AuthController extends Controller
 {
+    /**
+     * @OA\Post(
+     * path="/api/register",
+     * summary="Register new user",
+     * tags={"Authentication"},
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\JsonContent(
+     * type="object",
+     * @OA\Property(property="no_induk", type="string", example="12345"),
+     * @OA\Property(property="name", type="string", example="John Doe"),
+     * @OA\Property(property="email", type="string", example="john.doe@example.com"),
+     * @OA\Property(property="password", type="string", example="password123"),
+     * @OA\Property(property="is_admin", type="boolean", example=false),
+     * )
+     * ),
+     * @OA\Response(response=201, description="User created successfully."),
+     * @OA\Response(response=422, description="Validation failed."),
+     * @OA\Response(response=500, description="Server error."),
+     * )
+     */
     public function register(Request $request)
     {
         try {
@@ -55,6 +77,25 @@ class AuthController extends Controller
     }
 
 
+    /**
+     * @OA\Post(
+     * path="/api/login",
+     * summary="Login user",
+     * tags={"Authentication"},
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\JsonContent(
+     * type="object",
+     * @OA\Property(property="no_induk", type="string", example="12345"),
+     * @OA\Property(property="password", type="string", example="password123"),
+     * )
+     * ),
+     * @OA\Response(response=200, description="Login successful."),
+     * @OA\Response(response=401, description="Invalid login credentials."),
+     * @OA\Response(response=422, description="Validation failed."),
+     * @OA\Response(response=500, description="Server error."),
+     * )
+     */
     public function login(Request $request)
     {
         try {
