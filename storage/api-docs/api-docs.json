@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "API Documentation",
-        "description": "Dokumentasi API untuk aplikasi Anda",
+        "description": "Langkah-langkah untuk melakukan tes API\n * 1. Register \n * 2. Login\n * 3. Setelah login,copy token yang di dapat lalu masukkan ke dalam bearer yang ada pada logo gembok\n * 4. setelahnya bisa melakukan tes API\n *\n * REKOMENDASI\n * 1. Create Category\n * 2. Create Buku\n * 3. Setelahnya bisa dilakukan testing fitur-fitur yang lain",
         "version": "1.0.0"
     },
     "paths": {
@@ -104,10 +104,10 @@
         "/api/{model}/list": {
             "get": {
                 "tags": [
-                    "Dynamic Routes"
+                    "API Documentation Dinamis"
                 ],
                 "summary": "Mendapatkan daftar data dari model dinamis",
-                "description": "Endpoint untuk mendapatkan daftar data dari model dinamis dengan paginasi.",
+                "description": "Model yang tersedia adalah \n     * 1. Buku\n     * 2. Category\n     * 3. Pinjam\n     * 4. Kembali\n     * 5. User",
                 "operationId": "getList",
                 "parameters": [
                     {
@@ -154,10 +154,10 @@
         "/api/{model}/{id}/show": {
             "get": {
                 "tags": [
-                    "Dynamic Routes"
+                    "API Documentation Dinamis"
                 ],
                 "summary": "Mendapatkan detail data dari model dinamis",
-                "description": "Endpoint untuk mendapatkan detail data berdasarkan ID dari model dinamis.",
+                "description": "Model yang tersedia adalah \n     * 1. Buku\n     * 2. Category\n     * 3. Pinjam\n     * 4. Kembali\n     * 5. User",
                 "operationId": "getShow",
                 "parameters": [
                     {
@@ -197,10 +197,10 @@
         "/api/{model}/create": {
             "post": {
                 "tags": [
-                    "Dynamic Routes"
+                    "API Documentation Dinamis"
                 ],
                 "summary": "Membuat data baru pada model dinamis",
-                "description": "Endpoint untuk membuat data baru pada model dinamis.",
+                "description": "Model yang tersedia adalah \n * 1. Buku\n * 2. Category\n * 3. Pinjam\n * 4. Kembali\n * 5. User",
                 "operationId": "createData",
                 "parameters": [
                     {
@@ -218,17 +218,188 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "properties": {
-                                    "field1": {
-                                        "type": "string",
-                                        "example": "value1"
+                                "oneOf": [
+                                    {
+                                        "title": "Buku",
+                                        "description": "Skema untuk membuat buku baru.",
+                                        "properties": {
+                                            "title": {
+                                                "type": "string",
+                                                "example": "Judul Buku"
+                                            },
+                                            "isbn": {
+                                                "type": "string",
+                                                "example": "B-001"
+                                            },
+                                            "author": {
+                                                "type": "string",
+                                                "example": "Nama Pengarang"
+                                            },
+                                            "publish_date": {
+                                                "type": "string",
+                                                "format": "date",
+                                                "example": "2024-01-01"
+                                            },
+                                            "category": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "image": {
+                                                "type": "string",
+                                                "format": "binary"
+                                            }
+                                        },
+                                        "type": "object"
                                     },
-                                    "field2": {
-                                        "type": "integer",
-                                        "example": 123
+                                    {
+                                        "title": "Category",
+                                        "description": "Skema untuk membuat category baru.",
+                                        "properties": {
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Action"
+                                            },
+                                            "description": {
+                                                "type": "string",
+                                                "example": "Deskripsi kategori Action"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    {
+                                        "title": "Pinjam",
+                                        "description": "Skema untuk membuat peminjaman baru.",
+                                        "properties": {
+                                            "id_buku": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "id_user": {
+                                                "type": "integer",
+                                                "example": 5
+                                            },
+                                            "tgl_pinjam": {
+                                                "type": "string",
+                                                "format": "date",
+                                                "example": "2024-03-13"
+                                            },
+                                            "tgl_kembali": {
+                                                "type": "string",
+                                                "format": "date",
+                                                "example": "2024-03-20"
+                                            },
+                                            "status": {
+                                                "type": "string",
+                                                "example": "Dipinjam"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    {
+                                        "title": "Kembali",
+                                        "description": "Skema untuk mencatat pengembalian buku.",
+                                        "properties": {
+                                            "id_buku": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "id_user": {
+                                                "type": "integer",
+                                                "example": 5
+                                            },
+                                            "id_pinjam": {
+                                                "type": "integer",
+                                                "example": 10
+                                            },
+                                            "tgl_kembali": {
+                                                "type": "string",
+                                                "format": "date",
+                                                "example": "2024-03-20"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    {
+                                        "title": "User",
+                                        "description": "Skema untuk membuat pengguna baru.",
+                                        "properties": {
+                                            "name": {
+                                                "type": "string",
+                                                "example": "John Doe"
+                                            },
+                                            "no_induk": {
+                                                "type": "string",
+                                                "example": "123456"
+                                            },
+                                            "email": {
+                                                "type": "string",
+                                                "example": "johndoe@example.com"
+                                            },
+                                            "password": {
+                                                "type": "string",
+                                                "example": "password123"
+                                            },
+                                            "is_admin": {
+                                                "type": "boolean",
+                                                "example": false
+                                            },
+                                            "image": {
+                                                "type": "string",
+                                                "format": "binary"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                ]
+                            },
+                            "examples": {
+                                "Buku": {
+                                    "summary": "Contoh request untuk Buku",
+                                    "value": {
+                                        "title": "Judul Buku",
+                                        "isbn": "B-001",
+                                        "author": "Nama Pengarang",
+                                        "publish_date": "2024-01-01",
+                                        "category": 1,
+                                        "image": "string"
                                     }
                                 },
-                                "type": "object"
+                                "Category": {
+                                    "summary": "Contoh request untuk Category",
+                                    "value": {
+                                        "name": "Action",
+                                        "description": "Deskripsi kategori action"
+                                    }
+                                },
+                                "Pinjam": {
+                                    "summary": "Contoh request untuk Pinjam",
+                                    "value": {
+                                        "id_buku": 1,
+                                        "id_user": 5,
+                                        "tgl_pinjam": "2024-03-13",
+                                        "tgl_kembali": "2024-03-20"
+                                    }
+                                },
+                                "Kembali": {
+                                    "summary": "Contoh request untuk Kembali",
+                                    "value": {
+                                        "id_buku": 1,
+                                        "id_user": 5,
+                                        "id_pinjam": 10,
+                                        "tgl_kembali": "2024-03-20"
+                                    }
+                                },
+                                "User": {
+                                    "summary": "Contoh request untuk User",
+                                    "value": {
+                                        "name": "John Doe",
+                                        "no_induk": "123456",
+                                        "email": "johndoe@gmail.com",
+                                        "password": "password123",
+                                        "is_admin": false,
+                                        "image": "string"
+                                    }
+                                }
                             }
                         }
                     }
@@ -251,10 +422,10 @@
         "/api/{model}/{id}/update": {
             "put": {
                 "tags": [
-                    "Dynamic Routes"
+                    "API Documentation Dinamis"
                 ],
                 "summary": "Memperbarui data pada model dinamis",
-                "description": "Endpoint untuk memperbarui data pada model dinamis berdasarkan ID.",
+                "description": "Model yang tersedia adalah \n * 1. Buku\n * 2. Category\n * 3. Pinjam\n * 4. Kembali\n * 5. User",
                 "operationId": "updateData",
                 "parameters": [
                     {
@@ -281,17 +452,189 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "properties": {
-                                    "field1": {
-                                        "type": "string",
-                                        "example": "updatedValue1"
+                                "oneOf": [
+                                    {
+                                        "title": "Buku",
+                                        "description": "Skema untuk memperbarui buku.",
+                                        "properties": {
+                                            "title": {
+                                                "type": "string",
+                                                "example": "Judul Buku Baru"
+                                            },
+                                            "isbn": {
+                                                "type": "string",
+                                                "example": "B-002"
+                                            },
+                                            "author": {
+                                                "type": "string",
+                                                "example": "Nama Pengarang Baru"
+                                            },
+                                            "publish_date": {
+                                                "type": "string",
+                                                "format": "date",
+                                                "example": "2024-02-01"
+                                            },
+                                            "category": {
+                                                "type": "integer",
+                                                "example": 2
+                                            },
+                                            "image": {
+                                                "type": "string",
+                                                "format": "binary"
+                                            }
+                                        },
+                                        "type": "object"
                                     },
-                                    "field2": {
-                                        "type": "integer",
-                                        "example": 456
+                                    {
+                                        "title": "Category",
+                                        "description": "Skema untuk memperbarui kategori.",
+                                        "properties": {
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Adventure"
+                                            },
+                                            "description": {
+                                                "type": "string",
+                                                "example": "Deskripsi kategori Adventure"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    {
+                                        "title": "Pinjam",
+                                        "description": "Skema untuk memperbarui peminjaman.",
+                                        "properties": {
+                                            "id_buku": {
+                                                "type": "integer",
+                                                "example": 2
+                                            },
+                                            "id_user": {
+                                                "type": "integer",
+                                                "example": 6
+                                            },
+                                            "tgl_pinjam": {
+                                                "type": "string",
+                                                "format": "date",
+                                                "example": "2024-03-15"
+                                            },
+                                            "tgl_kembali": {
+                                                "type": "string",
+                                                "format": "date",
+                                                "example": "2024-03-22"
+                                            },
+                                            "status": {
+                                                "type": "string",
+                                                "example": "Diperpanjang"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    {
+                                        "title": "Kembali",
+                                        "description": "Skema untuk memperbarui pengembalian buku.",
+                                        "properties": {
+                                            "id_buku": {
+                                                "type": "integer",
+                                                "example": 2
+                                            },
+                                            "id_user": {
+                                                "type": "integer",
+                                                "example": 6
+                                            },
+                                            "id_pinjam": {
+                                                "type": "integer",
+                                                "example": 11
+                                            },
+                                            "tgl_kembali": {
+                                                "type": "string",
+                                                "format": "date",
+                                                "example": "2024-03-22"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    {
+                                        "title": "User",
+                                        "description": "Skema untuk memperbarui pengguna.",
+                                        "properties": {
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Jane Doe"
+                                            },
+                                            "no_induk": {
+                                                "type": "string",
+                                                "example": "654321"
+                                            },
+                                            "email": {
+                                                "type": "string",
+                                                "example": "janedoe@example.com"
+                                            },
+                                            "password": {
+                                                "type": "string",
+                                                "example": "newpassword123"
+                                            },
+                                            "is_admin": {
+                                                "type": "boolean",
+                                                "example": true
+                                            },
+                                            "image": {
+                                                "type": "string",
+                                                "format": "binary"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                ]
+                            },
+                            "examples": {
+                                "Buku": {
+                                    "summary": "Contoh request untuk Buku",
+                                    "value": {
+                                        "title": "Judul Buku Baru",
+                                        "isbn": "B-002",
+                                        "author": "Nama Pengarang Baru",
+                                        "publish_date": "2024-02-01",
+                                        "category": 2,
+                                        "image": "string"
                                     }
                                 },
-                                "type": "object"
+                                "Category": {
+                                    "summary": "Contoh request untuk Category",
+                                    "value": {
+                                        "name": "Adventure",
+                                        "description": "Deskripsi kategori Adventure"
+                                    }
+                                },
+                                "Pinjam": {
+                                    "summary": "Contoh request untuk Pinjam",
+                                    "value": {
+                                        "id_buku": 2,
+                                        "id_user": 6,
+                                        "tgl_pinjam": "2024-03-15",
+                                        "tgl_kembali": "2024-03-22",
+                                        "status": "Diperpanjang"
+                                    }
+                                },
+                                "Kembali": {
+                                    "summary": "Contoh request untuk Kembali",
+                                    "value": {
+                                        "id_buku": 2,
+                                        "id_user": 6,
+                                        "id_pinjam": 11,
+                                        "tgl_kembali": "2024-03-22"
+                                    }
+                                },
+                                "User": {
+                                    "summary": "Contoh request untuk User",
+                                    "value": {
+                                        "name": "Jane Doe",
+                                        "no_induk": "654321",
+                                        "email": "janedoe@example.com",
+                                        "password": "newpassword123",
+                                        "is_admin": true,
+                                        "image": "string"
+                                    }
+                                }
                             }
                         }
                     }
@@ -317,10 +660,10 @@
         "/api/{model}/{id}/delete": {
             "delete": {
                 "tags": [
-                    "Dynamic Routes"
+                    "API Documentation Dinamis"
                 ],
                 "summary": "Menghapus data dari model dinamis",
-                "description": "Endpoint untuk menghapus data dari model dinamis berdasarkan ID.",
+                "description": "Model yang tersedia adalah \n     * 1. Buku\n     * 2. Category\n     * 3. Pinjam\n     * 4. Kembali\n     * 5. User",
                 "operationId": "deleteData",
                 "parameters": [
                     {
@@ -363,7 +706,7 @@
         "/api/{model}/{id}/denda": {
             "post": {
                 "tags": [
-                    "Dynamic Routes"
+                    "API Documentation Denda Buku"
                 ],
                 "summary": "Membayar denda pengembalian",
                 "description": "Endpoint untuk membayar denda pengembalian buku.",
@@ -427,14 +770,26 @@
             }
         }
     },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer"
+            }
+        }
+    },
     "tags": [
         {
             "name": "Authentication",
             "description": "Authentication"
         },
         {
-            "name": "Dynamic Routes",
-            "description": "Dynamic Routes"
+            "name": "API Documentation Dinamis",
+            "description": "API Documentation Dinamis"
+        },
+        {
+            "name": "API Documentation Denda Buku",
+            "description": "API Documentation Denda Buku"
         }
     ]
 }

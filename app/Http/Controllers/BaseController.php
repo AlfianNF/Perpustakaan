@@ -15,7 +15,21 @@ use Illuminate\Database\QueryException;
  * @OA\Info(
  * title="API Documentation",
  * version="1.0.0",
- * description="Dokumentasi API untuk aplikasi Anda",
+ * description="Langkah-langkah untuk melakukan tes API
+ * 1. Register 
+ * 2. Login
+ * 3. Setelah login,copy token yang di dapat lalu masukkan ke dalam bearer yang ada pada logo gembok
+ * 4. setelahnya bisa melakukan tes API
+ *
+ * REKOMENDASI
+ * 1. Create Category
+ * 2. Create Buku
+ * 3. Setelahnya bisa dilakukan testing fitur-fitur yang lain",
+ * )
+ * @OA\SecurityScheme(
+ * type="http",
+ * scheme="bearer",
+ * securityScheme="bearerAuth"
  * )
  */
 class BaseController extends Controller
@@ -70,23 +84,6 @@ class BaseController extends Controller
     //     return response()->json($data, 200);
     // }
 
-    // public function isList($model)
-    // {
-    //     $table = Str::snake(Str::plural($model)); 
-    
-    //     if (!Schema::hasTable($table)) {
-    //         return response()->json(['message' => 'Table not found'], 404);
-    //     }
-    
-    //     $columns = Schema::getColumnListing($table);
-    
-    //     return response()->json([
-    //         'model' => $model,
-    //         'table' => $table,
-    //         'columns' => $columns
-    //     ], 200);
-    // }
-    
 
     // public function index($model, Request $request)
     // {
@@ -111,9 +108,14 @@ class BaseController extends Controller
      * @OA\Get(
      * path="/api/{model}/list",
      * operationId="getList",
-     * tags={"Dynamic Routes"},
+     * tags={"API Documentation Dinamis"},
      * summary="Mendapatkan daftar data dari model dinamis",
-     * description="Endpoint untuk mendapatkan daftar data dari model dinamis dengan paginasi.",
+     * description="Model yang tersedia adalah 
+     * 1. Buku
+     * 2. Category
+     * 3. Pinjam
+     * 4. Kembali
+     * 5. User",
      * security={{"bearerAuth":{}}},
      * @OA\Parameter(
      * name="model",
@@ -155,10 +157,15 @@ class BaseController extends Controller
      * @OA\Get(
      * path="/api/{model}/{id}/show",
      * operationId="getShow",
-     * tags={"Dynamic Routes"},
+     * tags={"API Documentation Dinamis"},
      * summary="Mendapatkan detail data dari model dinamis",
-     * description="Endpoint untuk mendapatkan detail data berdasarkan ID dari model dinamis.",
-     * security={{"bearerAuth":{}}},
+     * description="Model yang tersedia adalah 
+     * 1. Buku
+     * 2. Category
+     * 3. Pinjam
+     * 4. Kembali
+     * 5. User",
+    * security={{"bearerAuth":{}}},
      * @OA\Parameter(
      * name="model",
      * in="path",
@@ -188,73 +195,192 @@ class BaseController extends Controller
         return response()->json($data, 200);
     }
 
-    /**
-     * @OA\Post(
-     * path="/api/{model}/create",
-     * operationId="createData",
-     * tags={"Dynamic Routes"},
-     * summary="Membuat data baru pada model dinamis",
-     * description="Endpoint untuk membuat data baru pada model dinamis.",
-     * security={{"bearerAuth":{}}},
-     * @OA\Parameter(
-     * name="model",
-     * in="path",
-     * required=true,
-     * description="Nama model (misalnya: buku, user)",
-     * @OA\Schema(type="string")
-     * ),
-     * @OA\RequestBody(
-     * required=true,
-     * @OA\JsonContent(
-     * type="object",
-     * @OA\Property(property="field1", type="string", example="value1"),
-     * @OA\Property(property="field2", type="integer", example=123)
-     * )
-     * ),
-     * @OA\Response(response=201, description="Data berhasil dibuat"),
-     * @OA\Response(response=400, description="Validasi gagal")
-     * )
-     */
+/**
+ * @OA\Post(
+ * path="/api/{model}/create",
+ * operationId="createData",
+ * tags={"API Documentation Dinamis"},
+ * summary="Membuat data baru pada model dinamis",
+ * description="Model yang tersedia adalah 
+ * 1. Buku
+ * 2. Category
+ * 3. Pinjam
+ * 4. Kembali
+ * 5. User",
+ * security={{"bearerAuth":{}}},
+ * @OA\Parameter(
+ * name="model",
+ * in="path",
+ * required=true,
+ * description="Nama model (misalnya: buku, user)",
+ * @OA\Schema(type="string")
+ * ),
+ * @OA\RequestBody(
+ * required=true,
+ * @OA\JsonContent(
+ * oneOf={
+ * @OA\Schema(
+ * title="Buku",
+ * type="object",
+ * description="Skema untuk membuat buku baru.",
+ * @OA\Property(property="title", type="string", example="Judul Buku"),
+ * @OA\Property(property="isbn", type="string", example="B-001"),
+ * @OA\Property(property="author", type="string", example="Nama Pengarang"),
+ * @OA\Property(property="publish_date", type="string", format="date", example="2024-01-01"),
+ * @OA\Property(property="category", type="integer", example=1),
+ * @OA\Property(property="image", type="string", format="binary")
+ * ),
+ * @OA\Schema(
+ * title="Category",
+ * type="object",
+ * description="Skema untuk membuat category baru.",
+ * @OA\Property(property="name", type="string", example="Action"),
+ * @OA\Property(property="description", type="string", example="Deskripsi kategori Action")
+ * ),
+ * @OA\Schema(
+ * title="Pinjam",
+ * type="object",
+ * description="Skema untuk membuat peminjaman baru.",
+ * @OA\Property(property="id_buku", type="integer", example=1),
+ * @OA\Property(property="id_user", type="integer", example=5),
+ * @OA\Property(property="tgl_pinjam", type="string", format="date", example="2024-03-13"),
+ * @OA\Property(property="tgl_kembali", type="string", format="date", example="2024-03-20"),
+ * @OA\Property(property="status", type="string", example="Dipinjam")
+ * ),
+ * @OA\Schema(
+ * title="Kembali",
+ * type="object",
+ * description="Skema untuk mencatat pengembalian buku.",
+ * @OA\Property(property="id_buku", type="integer", example=1),
+ * @OA\Property(property="id_user", type="integer", example=5),
+ * @OA\Property(property="id_pinjam", type="integer", example=10),
+ * @OA\Property(property="tgl_kembali", type="string", format="date", example="2024-03-20")
+ * ),
+ * @OA\Schema(
+ * title="User",
+ * type="object",
+ * description="Skema untuk membuat pengguna baru.",
+ * @OA\Property(property="name", type="string", example="John Doe"),
+ * @OA\Property(property="no_induk", type="string", example="123456"),
+ * @OA\Property(property="email", type="string", example="johndoe@example.com"),
+ * @OA\Property(property="password", type="string", example="password123"),
+ * @OA\Property(property="is_admin", type="boolean", example=false),
+ * @OA\Property(property="image", type="string", format="binary")
+ * )
+ * },
+ * examples={
+ * @OA\Examples(example="Buku", summary="Contoh request untuk Buku", value={"title": "Judul Buku", "isbn": "B-001", "author": "Nama Pengarang", "publish_date": "2024-01-01", "category": 1, "image": "string"}),
+ * @OA\Examples(example="Category", summary="Contoh request untuk Category", value={"name": "Action", "description": "Deskripsi kategori action"}),
+ * @OA\Examples(example="Pinjam", summary="Contoh request untuk Pinjam", value={"id_buku": 1, "id_user": 5, "tgl_pinjam": "2024-03-13", "tgl_kembali": "2024-03-20"}),
+ * @OA\Examples(example="Kembali", summary="Contoh request untuk Kembali", value={"id_buku": 1, "id_user": 5, "id_pinjam": 10, "tgl_kembali": "2024-03-20"}),
+ * @OA\Examples(example="User", summary="Contoh request untuk User", value={"name": "John Doe", "no_induk": "123456", "email": "johndoe@gmail.com", "password": "password123", "is_admin": false, "image": "string"})
+ * }
+ * )
+ * ),
+ * @OA\Response(response=201, description="Data berhasil dibuat"),
+ * @OA\Response(response=400, description="Validasi gagal")
+ * )
+ */
+
+
     public function store($model, Request $request)
     {
         return app(CoreService::class)->handleRequest($model, $request, null, 'store');
     }
 
-    /**
-     * @OA\Put(
-     * path="/api/{model}/{id}/update",
-     * operationId="updateData",
-     * tags={"Dynamic Routes"},
-     * summary="Memperbarui data pada model dinamis",
-     * description="Endpoint untuk memperbarui data pada model dinamis berdasarkan ID.",
-     * security={{"bearerAuth":{}}},
-     * @OA\Parameter(
-     * name="model",
-     * in="path",
-     * required=true,
-     * description="Nama model (misalnya: buku, user)",
-     * @OA\Schema(type="string")
-     * ),
-     * @OA\Parameter(
-     * name="id",
-     * in="path",
-     * required=true,
-     * description="ID data",
-     * @OA\Schema(type="integer")
-     * ),
-     * @OA\RequestBody(
-     * required=true,
-     * @OA\JsonContent(
-     * type="object",
-     * @OA\Property(property="field1", type="string", example="updatedValue1"),
-     * @OA\Property(property="field2", type="integer", example=456)
-     * )
-     * ),
-     * @OA\Response(response=200, description="Data berhasil diperbarui"),
-     * @OA\Response(response=400, description="Validasi gagal"),
-     * @OA\Response(response=404, description="Data tidak ditemukan")
-     * )
-     */
+/**
+ * @OA\Put(
+ * path="/api/{model}/{id}/update",
+ * operationId="updateData",
+ * tags={"API Documentation Dinamis"},
+ * summary="Memperbarui data pada model dinamis",
+ * description="Model yang tersedia adalah 
+ * 1. Buku
+ * 2. Category
+ * 3. Pinjam
+ * 4. Kembali
+ * 5. User", * security={{"bearerAuth":{}}},
+ * @OA\Parameter(
+ * name="model",
+ * in="path",
+ * required=true,
+ * description="Nama model (misalnya: buku, user)",
+ * @OA\Schema(type="string")
+ * ),
+ * @OA\Parameter(
+ * name="id",
+ * in="path",
+ * required=true,
+ * description="ID data",
+ * @OA\Schema(type="integer")
+ * ),
+ * @OA\RequestBody(
+ * required=true,
+ * @OA\JsonContent(
+ * oneOf={
+ * @OA\Schema(
+ * title="Buku",
+ * type="object",
+ * description="Skema untuk memperbarui buku.",
+ * @OA\Property(property="title", type="string", example="Judul Buku Baru"),
+ * @OA\Property(property="isbn", type="string", example="B-002"),
+ * @OA\Property(property="author", type="string", example="Nama Pengarang Baru"),
+ * @OA\Property(property="publish_date", type="string", format="date", example="2024-02-01"),
+ * @OA\Property(property="category", type="integer", example=2),
+ * @OA\Property(property="image", type="string", format="binary")
+ * ),
+ * @OA\Schema(
+ * title="Category",
+ * type="object",
+ * description="Skema untuk memperbarui kategori.",
+ * @OA\Property(property="name", type="string", example="Adventure"),
+ * @OA\Property(property="description", type="string", example="Deskripsi kategori Adventure")
+ * ),
+ * @OA\Schema(
+ * title="Pinjam",
+ * type="object",
+ * description="Skema untuk memperbarui peminjaman.",
+ * @OA\Property(property="id_buku", type="integer", example=2),
+ * @OA\Property(property="id_user", type="integer", example=6),
+ * @OA\Property(property="tgl_pinjam", type="string", format="date", example="2024-03-15"),
+ * @OA\Property(property="tgl_kembali", type="string", format="date", example="2024-03-22"),
+ * @OA\Property(property="status", type="string", example="Diperpanjang")
+ * ),
+ * @OA\Schema(
+ * title="Kembali",
+ * type="object",
+ * description="Skema untuk memperbarui pengembalian buku.",
+ * @OA\Property(property="id_buku", type="integer", example=2),
+ * @OA\Property(property="id_user", type="integer", example=6),
+ * @OA\Property(property="id_pinjam", type="integer", example=11),
+ * @OA\Property(property="tgl_kembali", type="string", format="date", example="2024-03-22")
+ * ),
+ * @OA\Schema(
+ * title="User",
+ * type="object",
+ * description="Skema untuk memperbarui pengguna.",
+ * @OA\Property(property="name", type="string", example="Jane Doe"),
+ * @OA\Property(property="no_induk", type="string", example="654321"),
+ * @OA\Property(property="email", type="string", example="janedoe@example.com"),
+ * @OA\Property(property="password", type="string", example="newpassword123"),
+ * @OA\Property(property="is_admin", type="boolean", example=true),
+ * @OA\Property(property="image", type="string", format="binary")
+ * )
+ * },
+ * examples={
+ * @OA\Examples(example="Buku", summary="Contoh request untuk Buku", value={"title": "Judul Buku Baru", "isbn": "B-002", "author": "Nama Pengarang Baru", "publish_date": "2024-02-01", "category": 2, "image": "string"}),
+ * @OA\Examples(example="Category", summary="Contoh request untuk Category", value={"name": "Adventure", "description": "Deskripsi kategori Adventure"}),
+ * @OA\Examples(example="Pinjam", summary="Contoh request untuk Pinjam", value={"id_buku": 2, "id_user": 6, "tgl_pinjam": "2024-03-15", "tgl_kembali": "2024-03-22", "status": "Diperpanjang"}),
+ * @OA\Examples(example="Kembali", summary="Contoh request untuk Kembali", value={"id_buku": 2, "id_user": 6, "id_pinjam": 11, "tgl_kembali": "2024-03-22"}),
+ * @OA\Examples(example="User", summary="Contoh request untuk User", value={"name": "Jane Doe", "no_induk": "654321", "email": "janedoe@example.com", "password": "newpassword123", "is_admin": true, "image": "string"})
+ * }
+ * )
+ * ),
+ * @OA\Response(response=200, description="Data berhasil diperbarui"),
+ * @OA\Response(response=400, description="Validasi gagal"),
+ * @OA\Response(response=404, description="Data tidak ditemukan")
+ * )
+ */
     public function update($model, Request $request, $id)
     {
         return app(CoreService::class)->handleRequest($model, $request, $id, 'update');
@@ -334,9 +460,14 @@ class BaseController extends Controller
      * @OA\Delete(
      * path="/api/{model}/{id}/delete",
      * operationId="deleteData",
-     * tags={"Dynamic Routes"},
+     * tags={"API Documentation Dinamis"},
      * summary="Menghapus data dari model dinamis",
-     * description="Endpoint untuk menghapus data dari model dinamis berdasarkan ID.",
+     * description="Model yang tersedia adalah 
+     * 1. Buku
+     * 2. Category
+     * 3. Pinjam
+     * 4. Kembali
+     * 5. User",
      * security={{"bearerAuth":{}}},
      * @OA\Parameter(
      * name="model",
@@ -367,7 +498,7 @@ class BaseController extends Controller
      * @OA\Post(
      * path="/api/{model}/{id}/denda",
      * operationId="bayarDenda",
-     * tags={"Dynamic Routes"},
+     * tags={"API Documentation Denda Buku"},
      * summary="Membayar denda pengembalian",
      * description="Endpoint untuk membayar denda pengembalian buku.",
      * security={{"bearerAuth":{}}},

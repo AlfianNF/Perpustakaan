@@ -170,6 +170,10 @@ return [
         */
         'securityDefinitions' => [
             'securitySchemes' => [
+                'bearerAuth' => [
+                    'type' => 'http',
+                    'scheme' => 'bearer',
+                ],
                 /*
                  * Examples of Security schemes
                  */
