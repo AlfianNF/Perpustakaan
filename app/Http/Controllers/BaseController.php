@@ -137,20 +137,25 @@ class BaseController extends Controller
      * )
      */
      
-    public function index($model, Request $request)
-    {
-        $query = app(QueryService::class)->getQuery($model, $request);
-        $results = $query->paginate(21); 
-        return response()->json([
-            "message" =>"Data Ditemukan",
-            "data" => $results
-        ], 200); 
-
-        // $query = $this->queryService->getQuery($model, $request);
-        // return app(QueryService::class)->getQuery($model, $request);
-
-        // return response()->json($query->paginate(21), 200);
-    }
+     public function index($model, Request $request)
+     {
+         $query = app(QueryService::class)->getQuery($model, $request);
+     
+         if (is_string($query)) {
+             // Terjadi kesalahan, $query adalah pesan kesalahan
+             return response()->json([
+                 "message" => $query, // Mengembalikan pesan kesalahan
+             ], 400); // Menggunakan kode status 400 (Bad Request) untuk kesalahan
+         }
+     
+         // $query adalah objek Builder, lanjutkan dengan paginate
+         $results = $query->paginate(21);
+     
+         return response()->json([
+             "message" => "Data Ditemukan",
+             "data" => $results
+         ], 200);
+     }
 
 
     /**
@@ -165,7 +170,7 @@ class BaseController extends Controller
      * 3. Pinjam
      * 4. Kembali
      * 5. User",
-    * security={{"bearerAuth":{}}},
+     * security={{"bearerAuth":{}}},
      * @OA\Parameter(
      * name="model",
      * in="path",

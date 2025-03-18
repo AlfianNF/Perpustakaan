@@ -33,13 +33,13 @@ class QueryService
     //     return $classModel;
     // }
 
-    public function getQuery($model, Request $request): Builder
+    public function getQuery($model, Request $request): Builder|string
     {
         try {
             $modelClass = '\\App\\Models\\' . Str::studly($model);
     
             if (!class_exists($modelClass)) {
-                abort(404, 'Model not found');
+                return 'Model "' . $model . '" not found.';
             }
     
             $query = $modelClass::query();
@@ -51,7 +51,7 @@ class QueryService
     
             return $query;
         } catch (\Exception $e) {
-            abort(500, 'Error processing request.');
+            return 'Error processing request: ' . $e->getMessage();
         }
     }
 
@@ -160,13 +160,29 @@ class QueryService
 
     public function getShow(string $modelClass, int $id)
     {
-        try{
+        try {
+            if (!class_exists($modelClass)) {
+                $modelName = class_basename($modelClass);
+                return response()->json([
+                    "message"=> "Model '$modelName' tidak ditemukan."
+                ], 404);
+            }
+
             $baseModel = new $modelClass();
             $relations = $baseModel->getRelations();
-    
-            return $modelClass::with($relations)->find($id);
-        }catch(Exception $e){
-            throw new Exception($e->getMessage());
+
+            $result = $modelClass::with($relations)->find($id);
+
+            if (!$result) {
+                $modelName = class_basename($modelClass);
+                return response()->json([
+                    "message" => "Id $id di model '$modelName' tidak ditemukan."
+                ], 404);
+            }
+
+            return $result;
+        } catch (Exception $e) {
+            return "Error processing request: " . $e->getMessage();
         }
     }
 }
