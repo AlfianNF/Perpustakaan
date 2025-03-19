@@ -60,7 +60,8 @@ class User extends Authenticatable
     protected static $is_add = ['name', 'no_induk', 'email', 'is_admin','image','password'];
     protected static $is_edit = ['name', 'email', 'is_admin','image','password']; 
     protected static $is_delete = ['name', 'no_induk', 'email', 'is_admin','image','password'];
-    protected static $is_filter = ['name','is_admin'];
+    protected static $is_filter = ['is_admin'];
+    protected static $is_search = ['name','email','no_induk'];
     
 
     protected static $rules = [ // Validation rules
@@ -86,6 +87,7 @@ class User extends Authenticatable
             'edit' => self::$is_edit,
             'delete' => self::$is_delete,
             'filter' => self::$is_filter,
+            'search' => self::$is_search,
             default => [],
         };
     }

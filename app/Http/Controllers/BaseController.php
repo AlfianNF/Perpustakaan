@@ -142,14 +142,12 @@ class BaseController extends Controller
          $query = app(QueryService::class)->getQuery($model, $request);
      
          if (is_string($query)) {
-             // Terjadi kesalahan, $query adalah pesan kesalahan
              return response()->json([
-                 "message" => $query, // Mengembalikan pesan kesalahan
-             ], 400); // Menggunakan kode status 400 (Bad Request) untuk kesalahan
+                 "message" => $query, 
+             ], 400);
          }
      
-         // $query adalah objek Builder, lanjutkan dengan paginate
-         $results = $query->paginate(21);
+         $results = $query->paginate(20);
      
          return response()->json([
              "message" => "Data Ditemukan",

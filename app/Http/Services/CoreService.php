@@ -76,7 +76,7 @@ class CoreService
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
                 $imageName = time() . '.' . $image->getClientOriginalExtension();
-                $imagePath = $image->storeAs('images/buku', $imageName, 'public');
+                $imagePath = $image->storeAs('images', $imageName, 'public');
 
                 $requestData['image'] = $imagePath; 
             }

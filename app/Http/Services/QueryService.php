@@ -55,6 +55,29 @@ class QueryService
         }
     }
 
+    protected function userQuery(Builder $query, Request $request): Builder
+    {
+        $filters = $request->only(User::getAllowedFields('filter'));
+
+        if (!empty($filters)) {
+            foreach ($filters as $field => $value) {
+                $query->where($field, 'LIKE', "%{$value}%");
+            }
+        }
+
+        $search = $request->input('search');
+        if ($search) {
+            $allowedSearch = User::getAllowedFields('search');
+            $query->where(function ($q) use ($search, $allowedSearch) {
+                foreach ($allowedSearch as $field) {
+                    $q->orWhereRaw("LOWER($field) LIKE LOWER(?)", ["%{$search}%"]);
+                }
+            });
+        }
+
+        return $query->orderBy('created_at', 'DESC');
+    }
+
     protected function bukuQuery(Builder $query, Request $request): Builder
     {
         $filters = $request->only(Buku::getAllowedFields('filter'));
