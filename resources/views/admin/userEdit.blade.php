@@ -1,12 +1,4 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vue in Laravel</title>
-    @vite(['resources/js/app.js'])
-</head>
-<body>
+@extends('components.base')
+@section('content')
     <div id="app"></div>
-</body>
-</html>
+@endsection

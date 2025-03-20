@@ -6,7 +6,10 @@ import ShowBuku from './Buku/ShowBuku.vue';
 import AdminDashboard from './Admin/AdminDashboard.vue';
 import AdminUserDashboard from './Admin/User.vue';
 import AdminSettingDashboard from './Admin/Setting.vue';
-import AdminEditUserDashboard from './Admin/EditUser.vue'
+import AdminEditUserDashboard from './Admin/EditUser.vue';
+import AdminPinjam from './Admin/Pinjam.vue';
+import AdminKembali from './Admin/Kembali.vue';
+import AdminDenda from './Admin/Denda.vue';
 
 const routes = [
     { path: '/', component: LoginComponent },
@@ -18,6 +21,9 @@ const routes = [
     { path: '/dashboard-admin/users', component: AdminUserDashboard, meta: { requiresAuth: true } },
     { path: '/dashboard-admin/users/:id/edit', component: AdminEditUserDashboard, meta: { requiresAuth: true } },
     { path: '/dashboard-admin/settings', component: AdminSettingDashboard, meta: { requiresAuth: true } },
+    { path: '/dashboard-admin/pinjam', component: AdminPinjam, meta: { requiresAuth: true } },
+    { path: '/dashboard-admin/kembali', component: AdminKembali, meta: { requiresAuth: true } },
+    { path: '/dashboard-admin/denda', component: AdminDenda, meta: { requiresAuth: true } },
 ];
 
 const router = createRouter({

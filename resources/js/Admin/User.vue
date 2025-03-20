@@ -37,7 +37,7 @@
                 <div v-if="users.length > 0" class="overflow-x-auto">
                     <table class="min-w-full bg-white border border-gray-300 text-center">
                         <thead>
-                            <tr>
+                            <tr class="bg-gray-100">
                                 <th class="py-2 px-4 border-b">No</th>
                                 <th class="py-2 px-4 border-b">Nama</th>
                                 <th class="py-2 px-4 border-b">Email</th>

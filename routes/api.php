@@ -11,6 +11,7 @@ use App\Http\Controllers\BukuController;
 // })->middleware('auth:sanctum');
 
 Route::middleware('auth:sanctum')->group(function(){
+    Route::get('user',[BaseController::class,'user']);
     Route::get('{model}/list',[BaseController::class,'index']);
     Route::get('{model}/{id}/show',[BaseController::class,'show']);
     // Route::get('{model}/is-list', [BaseController::class, 'isList']);

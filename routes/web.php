@@ -29,3 +29,15 @@ Route::get('/dashboard-admin/settings', function () {
 Route::get('/dashboard-admin/users/{id}/edit', function () {
     return view('admin.userEdit');
 });
+
+Route::get('/dashboard-admin/pinjam', function () {
+    return view('admin.pinjam');
+});
+
+Route::get('/dashboard-admin/kembali', function () {
+    return view('admin.kembali');
+});
+
+Route::get('/dashboard-admin/denda', function () {
+    return view('admin.setting');
+});

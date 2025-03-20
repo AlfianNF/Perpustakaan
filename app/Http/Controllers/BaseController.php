@@ -155,6 +155,9 @@ class BaseController extends Controller
          ], 200);
      }
 
+     public function user(){
+        return response()->json(auth()->user());
+     }
 
     /**
      * @OA\Get(

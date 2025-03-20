@@ -56,6 +56,7 @@
                                 id="no_induk"
                                 type="text"
                                 placeholder="No Induk"
+                                readonly
                             />
                         </div>
                         <div class="mb-4">
@@ -167,7 +168,6 @@
             const token = localStorage.getItem("token");
             const formData = new FormData();
 
-            // Method spoofing untuk Laravel agar mengenali sebagai PUT
             formData.append("_method", "PUT");
 
             formData.append("name", this.user.name);
@@ -180,7 +180,7 @@
             }
 
             await axios.post(
-            `${this.baseURL}api/user/${this.$route.params.id}/update`, // Tetap pakai POST
+            `${this.baseURL}api/user/${this.$route.params.id}/update`, 
             formData,
             {
                 headers: {
