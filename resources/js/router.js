@@ -15,7 +15,7 @@ const routes = [
     { path: '/', component: LoginComponent },
     { path: '/register', component: RegisterComponent },
     { path: '/dashboard', component: DashboardComponent, meta: { requiresAuth: true } },
-    { path: '/book/:id/show', component: ShowBuku, name: 'ShowBuku' },
+    { path: '/book/:id/show', component: ShowBuku, name: 'ShowBuku',meta: { requiresAuth: true } },
 
     { path: '/dashboard-admin', component: AdminDashboard, meta: { requiresAuth: true } },
     { path: '/dashboard-admin/users', component: AdminUserDashboard, meta: { requiresAuth: true } },

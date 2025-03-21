@@ -81,14 +81,8 @@ export default {
             this.isDropdownOpen = !this.isDropdownOpen;
         },
         logout() {
-            axios
-                .post("/api/logout")
-                .then(() => {
-                    this.$router.push("/login");
-                })
-                .catch((error) => {
-                    console.error("Logout failed:", error);
-                });
+            localStorage.removeItem("token");
+            window.location.href = "/";
         },
         async fetchUserProfile() {
             try {
