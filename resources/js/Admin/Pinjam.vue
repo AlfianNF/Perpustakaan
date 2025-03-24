@@ -7,86 +7,137 @@
                 <h1 class="text-xl font-semibold mb-4">Daftar Peminjaman</h1>
 
                 <div class="mb-4 flex gap-4 items-center">
-    <!-- Input Pencarian -->
-    <input
-        v-model="searchQuery"
-        type="text"
-        placeholder="Cari buku atau user..."
-        class="p-2 border rounded w-1/3"
-        @keyup.enter="fetchPinjam"
-    />
-    
-    <!-- Tombol Cari -->
-    <button
-        @click="fetchPinjam"
-        class="px-4 py-2 bg-blue-500 text-white rounded inline-flex items-center gap-2"
-    >
-        Cari
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <circle cx="11" cy="11" r="8"></circle>
-            <path d="m21 21-4.3-4.3"></path>
-        </svg>
-    </button>
-    
-    <!-- Input Tanggal -->
-    <input
-        v-model="filterDate"
-        type="date"
-        class="p-2 border rounded"
-        @change="fetchPinjam"
-    />
+                    <input
+                        v-model="searchQuery"
+                        type="text"
+                        placeholder="Cari buku atau user..."
+                        class="p-2 border rounded w-1/3"
+                        @keyup.enter="fetchPinjam"
+                    />
 
-    <!-- Tombol Filter -->
-    <button
-        @click="toggleFilter"
-        class="px-4 py-2 bg-gray-200 rounded inline-flex items-center gap-2"
-    >
-        Filter
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path d="M10 20a1 1 0 0 0 .555.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.74 1.67l7.223 7.989A2 2 0 0 1 10 14v6Z"></path>
-        </svg>
-    </button>
+                    <button
+                        @click="fetchPinjam"
+                        class="px-4 py-2 bg-blue-500 text-white rounded inline-flex items-center gap-2"
+                    >
+                        Cari
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="w-5 h-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.3-4.3"></path>
+                        </svg>
+                    </button>
 
-    <!-- Modal Filter -->
-    <div v-if="showFilterOptions" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-        <div class="bg-white p-6 rounded-lg shadow-lg w-1/3">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4 text-center">
-                Pilih Status Peminjaman
-            </h2>
-            <div class="space-y-3">
-                <label class="flex items-center gap-2 p-3 border rounded-lg hover:bg-gray-100 cursor-pointer">
-                    <input type="radio" v-model="filterStatus" value="all" @change="fetchPinjam" class="h-5 w-5 accent-blue-500"/>
-                    <span class="text-gray-700 text-lg">Semua</span>
-                </label>
-                <label class="flex items-center gap-2 p-3 border rounded-lg hover:bg-gray-100 cursor-pointer">
-                    <input type="radio" v-model="filterStatus" value="dipinjam" @change="fetchPinjam" class="h-5 w-5 accent-blue-500"/>
-                    <span class="text-gray-700 text-lg">Dipinjam</span>
-                </label>
-                <label class="flex items-center gap-2 p-3 border rounded-lg hover:bg-gray-100 cursor-pointer">
-                    <input type="radio" v-model="filterStatus" value="dikembalikan" @change="fetchPinjam" class="h-5 w-5 accent-blue-500"/>
-                    <span class="text-gray-700 text-lg">Dikembalikan</span>
-                </label>
-            </div>
-            <div class="mt-6 flex justify-end">
-                <button @click="toggleFilter" class="px-5 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition">
-                    Tutup
-                </button>
-            </div>
-        </div>
-    </div>
+                    <input
+                        v-model="filterDate"
+                        type="date"
+                        class="p-2 border rounded"
+                        @change="fetchPinjam"
+                    />
 
-    <!-- Tombol Tambah -->
-    <button
-        @click="showModal = true"
-        class="px-4 py-2 bg-green-500 text-white rounded inline-flex items-center gap-2"
-    >
-        Tambah
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path d="M5 12h14M12 5v14"></path>
-        </svg>
-    </button>
-</div>
+                    <button
+                        @click="toggleFilter"
+                        class="px-4 py-2 bg-gray-200 rounded inline-flex items-center gap-2"
+                    >
+                        Filter
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="w-5 h-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                d="M10 20a1 1 0 0 0 .555.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.74 1.67l7.223 7.989A2 2 0 0 1 10 14v6Z"
+                            ></path>
+                        </svg>
+                    </button>
 
+                    <div
+                        v-if="showFilterOptions"
+                        class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+                    >
+                        <div class="bg-white p-6 rounded-lg shadow-lg w-1/3">
+                            <h2
+                                class="text-xl font-semibold text-gray-800 mb-4 text-center"
+                            >
+                                Pilih Status Peminjaman
+                            </h2>
+                            <div class="space-y-3">
+                                <label
+                                    class="flex items-center gap-2 p-3 border rounded-lg hover:bg-gray-100 cursor-pointer"
+                                >
+                                    <input
+                                        type="radio"
+                                        v-model="filterStatus"
+                                        value="all"
+                                        @change="fetchPinjam"
+                                        class="h-5 w-5 accent-blue-500"
+                                    />
+                                    <span class="text-gray-700 text-lg"
+                                        >Semua</span
+                                    >
+                                </label>
+                                <label
+                                    class="flex items-center gap-2 p-3 border rounded-lg hover:bg-gray-100 cursor-pointer"
+                                >
+                                    <input
+                                        type="radio"
+                                        v-model="filterStatus"
+                                        value="dipinjam"
+                                        @change="fetchPinjam"
+                                        class="h-5 w-5 accent-blue-500"
+                                    />
+                                    <span class="text-gray-700 text-lg"
+                                        >Dipinjam</span
+                                    >
+                                </label>
+                                <label
+                                    class="flex items-center gap-2 p-3 border rounded-lg hover:bg-gray-100 cursor-pointer"
+                                >
+                                    <input
+                                        type="radio"
+                                        v-model="filterStatus"
+                                        value="dikembalikan"
+                                        @change="fetchPinjam"
+                                        class="h-5 w-5 accent-blue-500"
+                                    />
+                                    <span class="text-gray-700 text-lg"
+                                        >Dikembalikan</span
+                                    >
+                                </label>
+                            </div>
+                            <div class="mt-6 flex justify-end">
+                                <button
+                                    @click="toggleFilter"
+                                    class="px-5 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition"
+                                >
+                                    Tutup
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button
+                        @click="showModal = true"
+                        class="px-4 py-2 bg-green-500 text-white rounded inline-flex items-center gap-2"
+                    >
+                        Tambah
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="w-5 h-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path d="M5 12h14M12 5v14"></path>
+                        </svg>
+                    </button>
+                </div>
 
                 <div class="bg-white shadow rounded-md p-4">
                     <table class="w-full border text-center">
@@ -251,6 +302,53 @@
             </div>
         </div>
     </div>
+    <div
+        v-if="showEditModal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+    >
+        <div class="bg-white p-6 rounded-lg shadow-lg w-1/3">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 text-center">
+                Edit Peminjaman
+            </h2>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-1"
+                    >Tanggal Pinjam</label
+                >
+                <input
+                    type="date"
+                    v-model="editedPinjam.tgl_pinjam"
+                    class="w-full p-2 border rounded"
+                />
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-1"
+                    >Tanggal Kembali</label
+                >
+                <input
+                    type="date"
+                    v-model="editedPinjam.tgl_kembali"
+                    class="w-full p-2 border rounded"
+                />
+            </div>
+
+            <div class="mt-6 flex justify-end gap-3">
+                <button
+                    @click="showEditModal = false"
+                    class="px-5 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition"
+                >
+                    Batal
+                </button>
+                <button
+                    @click="updatePinjam"
+                    class="px-5 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
+                >
+                    Simpan
+                </button>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -287,6 +385,12 @@ export default {
                 tgl_pinjam: null,
                 tgl_kembali: null,
             },
+            showEditModal: false,
+            editedPinjam: {
+                id: null,
+                tgl_pinjam: "",
+                tgl_kembali: "",
+            },
         };
     },
     mounted() {
@@ -307,7 +411,7 @@ export default {
                             status:
                                 this.filterStatus !== "all"
                                     ? this.filterStatus
-                                    : undefined, // Tambahkan ini
+                                    : undefined,
                         },
                         headers: {
                             Authorization: `Bearer ${localStorage.getItem(
@@ -425,6 +529,43 @@ export default {
         toggleFilter() {
             this.showFilterOptions = !this.showFilterOptions;
         },
+        async editPinjam(id) {
+            try {
+                const token = localStorage.getItem("token"); 
+                const response = await axios.get(`/api/pinjam/${id}/show`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                this.editedPinjam = response.data;
+                this.showEditModal = true;
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        },
+
+        async updatePinjam() {
+    try {
+        const token = localStorage.getItem("token");
+        await axios.put(`/api/pinjam/${this.editedPinjam.id}/update`, {
+            tgl_pinjam: this.editedPinjam.tgl_pinjam,
+            tgl_kembali: this.editedPinjam.tgl_kembali
+        }, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+        alert("Data berhasil diperbarui!");
+        this.showEditModal = false;
+
+        window.location.reload(); 
+    } catch (error) {
+        console.error("Error updating data:", error);
+    }
+}
+
     },
 };
 </script>
