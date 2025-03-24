@@ -89,7 +89,7 @@
                                         {{ formatDate(item.tgl_kembali) }}
                                     </td>
                                     <td class="py-2 px-4 border-b">
-                                        {{ item.denda }}
+                                        Rp. {{ item.denda }}
                                     </td>
                                 </tr>
                             </tbody>
@@ -148,7 +148,7 @@
       <input type="hidden" v-model="newKembali.id_buku" />
 
       <input
-        v-model="newKembali.tanggal"
+        v-model="newKembali.tgl_kembali"
         type="date"
         class="w-full p-2 border rounded mb-2"
       />
@@ -193,7 +193,7 @@ export default {
                 id_pinjam: "",
                 id_user: "",
                 id_buku: "",
-                tanggal: "",
+                tgl_kembali: "",
             },
             selectedPinjam: null,
         };
@@ -251,7 +251,7 @@ async addKembali() {
             id_pinjam: this.newKembali.id_pinjam,
             id_user: this.newKembali.id_user,
             id_buku: this.newKembali.id_buku,
-            tanggal: this.newKembali.tanggal,
+            tgl_kembali: this.newKembali.tgl_kembali,
         };
 
         const response = await axios.post(
