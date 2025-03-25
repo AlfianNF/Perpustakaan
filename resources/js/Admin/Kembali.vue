@@ -49,21 +49,25 @@
                 <div v-else-if="kembaliList.length">
                     <div class="bg-white shadow rounded-md p-4">
                         <table
-                            class="min-w-full bg-white border border-gray-300"
+                            class="min-w-full bg-white border border-gray-200 text-center"
                         >
                             <thead>
-                                <tr>
-                                    <th class="py-2 px-4 border-b">No</th>
-                                    <th class="py-2 px-4 border-b">
+                                <tr class="bg-gray-100">
+                                    <th class="border border-gray-300 p-2">
+                                        No
+                                    </th>
+                                    <th class="border border-gray-300 p-2">
                                         Nama Peminjam
                                     </th>
-                                    <th class="py-2 px-4 border-b">
+                                    <th class="border border-gray-300 p-2">
                                         Judul Buku
                                     </th>
-                                    <th class="py-2 px-4 border-b">
+                                    <th class="border border-gray-300 p-2">
                                         Tanggal Kembali
                                     </th>
-                                    <th class="py-2 px-4 border-b">Denda</th>
+                                    <th class="border border-gray-300 p-2">
+                                        Denda
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -71,24 +75,24 @@
                                     v-for="(item, index) in kembaliList"
                                     :key="item.id"
                                 >
-                                    <td class="py-2 px-4 border-b">
+                                    <td class="border border-gray-300 p-2">
                                         {{ index + 1 }}
                                     </td>
-                                    <td class="py-2 px-4 border-b">
+                                    <td class="border border-gray-300 p-2">
                                         {{
                                             item.peminjaman?.user_pinjam
                                                 ?.name || "-"
                                         }}
                                     </td>
-                                    <td class="py-2 px-4 border-b">
+                                    <td class="border border-gray-300 p-2">
                                         {{
                                             item.peminjaman?.buku?.title || "-"
                                         }}
                                     </td>
-                                    <td class="py-2 px-4 border-b">
+                                    <td class="border border-gray-300 p-2">
                                         {{ formatDate(item.tgl_kembali) }}
                                     </td>
-                                    <td class="py-2 px-4 border-b">
+                                    <td class="border border-gray-300 p-2">
                                         Rp. {{ item.denda }}
                                     </td>
                                 </tr>
@@ -102,10 +106,12 @@
                             >
                                 Previous
                             </button>
+
                             <span
                                 >Halaman {{ currentPage }} dari
                                 {{ totalPages }}</span
                             >
+
                             <button
                                 @click="nextPage"
                                 :disabled="currentPage >= totalPages"
@@ -121,54 +127,54 @@
         </div>
 
         <div
-    v-if="showModal"
-    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
-  >
-    <div class="bg-white p-6 rounded shadow-lg w-1/3">
-      <h2 class="text-xl font-semibold mb-4">Tambah Pengembalian</h2>
-
-      <select
-        v-if="pinjamList.length"
-        v-model="selectedPinjam"
-        @change="fillForm"
-        class="w-full p-2 border rounded mb-2"
-      >
-        <option
-          v-for="pinjam in pinjamList"
-          :key="pinjam.id"
-          :value="pinjam"
+            v-if="showModal"
+            class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
         >
-          {{ pinjam.user_pinjam?.name || "Tidak Ada Nama" }} -
-          {{ pinjam.buku?.title || "Tidak Ada Judul" }}
-        </option>
-      </select>
+            <div class="bg-white p-6 rounded shadow-lg w-1/3">
+                <h2 class="text-xl font-semibold mb-4">Tambah Pengembalian</h2>
 
-      <input type="hidden" v-model="newKembali.id_pinjam" />
-      <input type="hidden" v-model="newKembali.id_user" />
-      <input type="hidden" v-model="newKembali.id_buku" />
+                <select
+                    v-if="pinjamList.length"
+                    v-model="selectedPinjam"
+                    @change="fillForm"
+                    class="w-full p-2 border rounded mb-2"
+                >
+                    <option
+                        v-for="pinjam in pinjamList"
+                        :key="pinjam.id"
+                        :value="pinjam"
+                    >
+                        {{ pinjam.user_pinjam?.name || "Tidak Ada Nama" }} -
+                        {{ pinjam.buku?.title || "Tidak Ada Judul" }}
+                    </option>
+                </select>
 
-      <input
-        v-model="newKembali.tgl_kembali"
-        type="date"
-        class="w-full p-2 border rounded mb-2"
-      />
+                <input type="hidden" v-model="newKembali.id_pinjam" />
+                <input type="hidden" v-model="newKembali.id_user" />
+                <input type="hidden" v-model="newKembali.id_buku" />
 
-      <div class="flex justify-end gap-2">
-        <button
-          @click="showModal = false"
-          class="px-4 py-2 bg-gray-500 text-white rounded"
-        >
-          Batal
-        </button>
-        <button
-          @click="addKembali"
-          class="px-4 py-2 bg-blue-500 text-white rounded"
-        >
-          Simpan
-        </button>
-      </div>
-    </div>
-  </div>
+                <input
+                    v-model="newKembali.tgl_kembali"
+                    type="date"
+                    class="w-full p-2 border rounded mb-2"
+                />
+
+                <div class="flex justify-end gap-2">
+                    <button
+                        @click="showModal = false"
+                        class="px-4 py-2 bg-gray-500 text-white rounded"
+                    >
+                        Batal
+                    </button>
+                    <button
+                        @click="addKembali"
+                        class="px-4 py-2 bg-blue-500 text-white rounded"
+                    >
+                        Simpan
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -176,6 +182,7 @@
 import Sidebar from "@/components/Sidebar.vue";
 import Navbar from "@/components/Navbar.vue";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 export default {
     name: "Kembali",
@@ -184,7 +191,7 @@ export default {
         return {
             kembaliList: [],
             pinjamList: [],
-            loading: true,
+            loading: false,
             searchQuery: "",
             currentPage: 1,
             totalPages: 1,
@@ -207,14 +214,25 @@ export default {
             this.loading = true;
             try {
                 const token = localStorage.getItem("token");
+
+                const params = {
+                    page: this.currentPage,
+                };
+
+                if (this.searchQuery) {
+                    params.search = this.searchQuery;
+                }
+
                 const response = await axios.get(
                     "http://belajar.test/api/kembali/list",
                     {
-                        headers: { Authorization: `Bearer ${token}` },                       
+                        headers: { Authorization: `Bearer ${token}` },
+                        params,
                     }
                 );
+
                 this.kembaliList = response.data.data.data || [];
-                this.totalPages = response.data.last_page || 1;
+                this.totalPages = response.data.data.last_page || 1;
             } catch (err) {
                 console.error("Error fetching kembali list:", err);
             } finally {
@@ -236,41 +254,49 @@ export default {
             }
         },
         fillForm() {
-    if (this.selectedPinjam) {
-        this.newKembali.id_pinjam = this.selectedPinjam.id;
-        this.newKembali.id_user = this.selectedPinjam.id_user;
-        this.newKembali.id_buku = this.selectedPinjam.id_buku;
-    }
-},
-
-async addKembali() {
-    try {
-        const token = localStorage.getItem("token");
-
-        const payload = { 
-            id_pinjam: this.newKembali.id_pinjam,
-            id_user: this.newKembali.id_user,
-            id_buku: this.newKembali.id_buku,
-            tgl_kembali: this.newKembali.tgl_kembali,
-        };
-
-        const response = await axios.post(
-            "http://belajar.test/api/kembali/create",
-            payload,
-            {
-                headers: { Authorization: `Bearer ${token}` },
+            if (this.selectedPinjam) {
+                this.newKembali.id_pinjam = this.selectedPinjam.id;
+                this.newKembali.id_user = this.selectedPinjam.id_user;
+                this.newKembali.id_buku = this.selectedPinjam.id_buku;
             }
-        );
+        },
 
-        console.log("Pengembalian berhasil:", response.data);
-        this.showModal = false;
-        this.fetchPinjamList();
-    } catch (err) {
-        console.error("Error menambah pengembalian:", err);
-    }
-},
+        async addKembali() {
+            try {
+                const token = localStorage.getItem("token");
 
+                const payload = {
+                    id_pinjam: this.newKembali.id_pinjam,
+                    id_user: this.newKembali.id_user,
+                    id_buku: this.newKembali.id_buku,
+                    tgl_kembali: this.newKembali.tgl_kembali,
+                };
 
+                const response = await axios.post(
+                    "http://belajar.test/api/kembali/create",
+                    payload,
+                    {
+                        headers: { Authorization: `Bearer ${token}` },
+                    }
+                );
+
+                console.log("Pengembalian berhasil:", response.data);
+                this.showModal = false;
+                this.fetchPinjamList();
+
+                Swal.fire(
+                    "Berhasil!",
+                    "Data pengembalian berhasil ditambahkan.",
+                    "success"
+                );
+            } catch (err) {
+                Swal.fire(
+                    "Gagal!",
+                    "Gagal menambahkan data pengembalian.",
+                    "error"
+                );
+            }
+        },
         formatDate(dateString) {
             if (!dateString) return "-";
             const date = new Date(dateString);
@@ -279,6 +305,18 @@ async addKembali() {
                 month: "long",
                 year: "numeric",
             });
+        },
+        prevPage() {
+            if (this.currentPage > 1) {
+                this.currentPage--;
+                this.fetchKembaliList();
+            }
+        },
+        nextPage() {
+            if (this.currentPage < this.totalPages) {
+                this.currentPage++;
+                this.fetchKembaliList();
+            }
         },
     },
 };

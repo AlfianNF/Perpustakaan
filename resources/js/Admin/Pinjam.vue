@@ -357,6 +357,7 @@ import Navbar from "@/components/Navbar.vue";
 import LaravelSelect from "./../LaravelSelect.vue";
 import "vue-select/dist/vue-select.css";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 export default {
     name: "Pinjam",
@@ -441,23 +442,47 @@ export default {
             }
         },
         async deletePinjam(id) {
-            if (confirm("Apakah Anda yakin ingin menghapus data ini?")) {
-                try {
-                    await axios.delete(
-                        `${this.baseUrl}api/pinjam/${id}/delete`,
-                        {
-                            headers: {
-                                Authorization: `Bearer ${localStorage.getItem(
-                                    "token"
-                                )}`,
-                            },
-                        }
-                    );
-                    this.fetchPinjam();
-                } catch (error) {
-                    console.error("Gagal menghapus pinjam:", error);
+            Swal.fire({
+                title: "Apakah Anda yakin?",
+                text: "Anda tidak akan dapat mengembalikan data ini!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Ya, hapus!",
+                cancelButtonText: "Batal",
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        await axios.delete(
+                            `${this.baseUrl}api/pinjam/${id}/delete`,
+                            {
+                                headers: {
+                                    Authorization: `Bearer ${localStorage.getItem(
+                                        "token"
+                                    )}`,
+                                },
+                            }
+                        );
+
+                        this.fetchPinjam();
+
+                        Swal.fire(
+                            "Terhapus!",
+                            "Data peminjaman telah dihapus.",
+                            "success"
+                        );
+                    } catch (error) {
+                        console.error("Gagal menghapus pinjam:", error);
+
+                        Swal.fire(
+                            "Gagal!",
+                            "Gagal menghapus data peminjaman.",
+                            "error"
+                        );
+                    }
                 }
-            }
+            });
         },
         formatTanggal(tanggal) {
             if (!tanggal) return "";
@@ -477,6 +502,7 @@ export default {
                         },
                     }
                 );
+
                 this.showModal = false;
                 this.newPinjam = {
                     id_user: null,
@@ -485,8 +511,18 @@ export default {
                     tgl_kembali: null,
                 };
                 this.fetchPinjam();
+
+                Swal.fire(
+                    "Berhasil!",
+                    "Data peminjaman berhasil ditambahkan.",
+                    "success"
+                );
             } catch (error) {
-                console.error("Gagal menambahkan pinjam:", error);
+                Swal.fire(
+                    "Gagal!",
+                    "Gagal menambahkan data peminjaman.",
+                    "error"
+                );
             }
         },
         fetchAddPinjam() {
@@ -531,7 +567,7 @@ export default {
         },
         async editPinjam(id) {
             try {
-                const token = localStorage.getItem("token"); 
+                const token = localStorage.getItem("token");
                 const response = await axios.get(`/api/pinjam/${id}/show`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -546,26 +582,29 @@ export default {
         },
 
         async updatePinjam() {
-    try {
-        const token = localStorage.getItem("token");
-        await axios.put(`/api/pinjam/${this.editedPinjam.id}/update`, {
-            tgl_pinjam: this.editedPinjam.tgl_pinjam,
-            tgl_kembali: this.editedPinjam.tgl_kembali
-        }, {
-            headers: {
-                Authorization: `Bearer ${token}`
+            try {
+                const token = localStorage.getItem("token");
+                await axios.put(
+                    `/api/pinjam/${this.editedPinjam.id}/update`,
+                    {
+                        tgl_pinjam: this.editedPinjam.tgl_pinjam,
+                        tgl_kembali: this.editedPinjam.tgl_kembali,
+                    },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
+
+                alert("Data berhasil diperbarui!");
+                this.showEditModal = false;
+
+                window.location.reload();
+            } catch (error) {
+                console.error("Error updating data:", error);
             }
-        });
-
-        alert("Data berhasil diperbarui!");
-        this.showEditModal = false;
-
-        window.location.reload(); 
-    } catch (error) {
-        console.error("Error updating data:", error);
-    }
-}
-
+        },
     },
 };
 </script>

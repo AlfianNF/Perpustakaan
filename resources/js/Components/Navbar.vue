@@ -65,61 +65,61 @@
 import axios from "axios";
 
 export default {
-    name: "Navbar",
-    data() {
-        return {
-            isDropdownOpen: false,
-            profileImageUrl: "",
-            userName: "",
-        };
+  name: "Navbar",
+  data() {
+    return {
+      isDropdownOpen: false,
+      profileImageUrl: "",
+      userName: "",
+      baseURL: "http://belajar.test/",
+    };
+  },
+  mounted() {
+    this.fetchUserProfile();
+  },
+  methods: {
+    toggleDropdown() {
+      this.isDropdownOpen = !this.isDropdownOpen;
     },
-    mounted() {
-        this.fetchUserProfile();
+    logout() {
+      localStorage.removeItem("token");
+      window.location.href = "/";
     },
-    methods: {
-        toggleDropdown() {
-            this.isDropdownOpen = !this.isDropdownOpen;
-        },
-        logout() {
-            localStorage.removeItem("token");
-            window.location.href = "/";
-        },
-        async fetchUserProfile() {
-            try {
-                const response = await axios.get("/api/user", {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem(
-                            "token"
-                        )}`,
-                    },
-                });
+    async fetchUserProfile() {
+      try {
+        const response = await axios.get("/api/user", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
 
-                if (response.data && response.data.id) {
-                    const userResponse = await axios.get(
-                        `/api/user/${response.data.id}/show`,
-                        {
-                            headers: {
-                                Authorization: `Bearer ${localStorage.getItem(
-                                    "token"
-                                )}`,
-                            },
-                        }
-                    );
-                    if (userResponse.data || userResponse.data.image) {
-                        this.profileImageUrl = userResponse.data.image;
-                        this.userName = userResponse.data.name;
-                    } else {
-                        console.error(
-                            "Profile image URL not found in API response."
-                        );
-                    }
-                } else {
-                    console.error("User ID not found in API response.");
-                }
-            } catch (error) {
-                console.error("Error fetching user profile:", error);
+        if (response.data && response.data.id) {
+          const userResponse = await axios.get(
+            `/api/user/${response.data.id}/show`,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
             }
-        },
+          );
+          if (userResponse.data && userResponse.data.image && userResponse.data.name) {
+            // Modifikasi untuk mengambil gambar dari baseURL + storage/ + image
+            if (userResponse.data.image) {
+              this.profileImageUrl = this.baseURL + "storage/" + userResponse.data.image;
+            } else {
+              this.profileImageUrl = null; // Atau gambar placeholder jika tidak ada gambar
+            }
+            this.userName = userResponse.data.name;
+          } else {
+            console.error("Profile image or name not found in API response.");
+          }
+        } else {
+          console.error("User ID not found in API response.");
+        }
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+      }
     },
+  },
 };
 </script>

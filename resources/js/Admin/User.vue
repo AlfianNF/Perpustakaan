@@ -35,36 +35,48 @@
                     {{ error }}
                 </div>
                 <div v-if="users.length > 0" class="overflow-x-auto">
-                    <table class="min-w-full bg-white border border-gray-300 text-center">
+                    <table
+                        class="min-w-full bg-white border border-gray-300 text-center"
+                    >
                         <thead>
                             <tr class="bg-gray-100">
-                                <th class="py-2 px-4 border-b">No</th>
-                                <th class="py-2 px-4 border-b">Nama</th>
-                                <th class="py-2 px-4 border-b">Email</th>
-                                <th class="py-2 px-4 border-b">No Induk</th>
-                                <th class="py-2 px-4 border-b">Is Admin</th>
-                                <th class="py-2 px-4 border-b">Image</th>
-                                <th class="py-2 px-4 border-b">Aksi</th>
+                                <th class="border border-gray-300 p-2">No</th>
+                                <th class="border border-gray-300 p-2">Nama</th>
+                                <th class="border border-gray-300 p-2">
+                                    Email
+                                </th>
+                                <th class="border border-gray-300 p-2">
+                                    No Induk
+                                </th>
+                                <th class="border border-gray-300 p-2">
+                                    Is Admin
+                                </th>
+                                <th class="border border-gray-300 p-2">
+                                    Image
+                                </th>
+                                <th class="border border-gray-300 p-2">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-for="(user, index) in users" :key="user.id">
-                                <td class="py-2 px-4 border-b">
+                                <td class="border border-gray-300 p-2">
                                     {{ index + 1 }}
                                 </td>
-                                <td class="py-2 px-4 border-b">
+                                <td class="border border-gray-300 p-2">
                                     {{ user.name }}
                                 </td>
-                                <td class="py-2 px-4 border-b">
+                                <td class="border border-gray-300 p-2">
                                     {{ user.email }}
                                 </td>
-                                <td class="py-2 px-4 border-b">
+                                <td class="border border-gray-300 p-2">
                                     {{ user.no_induk }}
                                 </td>
-                                <td class="py-2 px-4 border-b">
+                                <td class="border border-gray-300 p-2">
                                     {{ user.is_admin ? "Admin" : "User" }}
                                 </td>
-                                <td class="py-2 px-4 border-b flex justify-center">
+                                <td
+                                    class="border border-gray-300 p-2 flex justify-center"
+                                >
                                     <img
                                         v-if="user.image"
                                         :src="getImageUrl(user.image)"
@@ -78,11 +90,17 @@
                                         class="w-16 h-16 object-cover rounded-full"
                                     />
                                 </td>
-                                <td class="py-2 px-4 border-b">
-                                    <button @click="editUser(user.id)" class="px-3 py-1 bg-blue-500 text-white rounded-md mr-2">
+                                <td class="border border-gray-300 p-2">
+                                    <button
+                                        @click="editUser(user.id)"
+                                        class="px-3 py-1 bg-blue-500 text-white rounded-md mr-2"
+                                    >
                                         Edit
                                     </button>
-                                    <button @click="deleteUser(user.id)" class="px-3 py-1 bg-red-500 text-white rounded-md">
+                                    <button
+                                        @click="deleteUser(user.id)"
+                                        class="px-3 py-1 bg-red-500 text-white rounded-md"
+                                    >
                                         Hapus
                                     </button>
                                 </td>
@@ -90,10 +108,16 @@
                         </tbody>
                     </table>
                 </div>
-                <div v-else-if="!loading && !error" class="text-center text-gray-600">
+                <div
+                    v-else-if="!loading && !error"
+                    class="text-center text-gray-600"
+                >
                     Tidak ada pengguna yang tersedia.
                 </div>
-                <div v-if="pagination.last_page > 1" class="flex justify-center mt-4">
+                <div
+                    v-if="pagination.last_page > 1"
+                    class="flex justify-center mt-4"
+                >
                     <button
                         :disabled="pagination.current_page === 1"
                         @click="changePage(pagination.current_page - 1)"
@@ -102,10 +126,13 @@
                         Previous
                     </button>
                     <span class="px-3 py-1 mx-1">
-                        Page {{ pagination.current_page }} of {{ pagination.last_page }}
+                        Page {{ pagination.current_page }} of
+                        {{ pagination.last_page }}
                     </span>
                     <button
-                        :disabled="pagination.current_page === pagination.last_page"
+                        :disabled="
+                            pagination.current_page === pagination.last_page
+                        "
                         @click="changePage(pagination.current_page + 1)"
                         class="px-3 py-1 mx-1 border rounded-md"
                     >
@@ -121,6 +148,7 @@
 import Sidebar from "@/components/Sidebar.vue";
 import Navbar from "@/components/Navbar.vue";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 export default {
     name: "User",
@@ -172,7 +200,10 @@ export default {
                     total: response.data.data.total,
                 };
             } catch (err) {
-                console.error("Error fetching users:", err.response ? err.response.data : err);
+                console.error(
+                    "Error fetching users:",
+                    err.response ? err.response.data : err
+                );
                 this.error = "Terjadi kesalahan saat mengambil data pengguna.";
             } finally {
                 this.loading = false;
@@ -191,20 +222,52 @@ export default {
             return `${this.baseURL}storage/${imagePath}`;
         },
         editUser(userId) {
-            this.$router.push({ path: `/dashboard-admin/users/${userId}/edit` });
+            this.$router.push({
+                path: `/dashboard-admin/users/${userId}/edit`,
+            });
         },
         async deleteUser(userId) {
-            if (!confirm("Apakah Anda yakin ingin menghapus pengguna ini?")) return;
-            try {
-                const token = localStorage.getItem("token");
-                await axios.delete(`${this.baseURL}api/user/${userId}/delete`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                this.fetchUsers();
-            } catch (err) {
-                console.error("Error deleting user:", err.response ? err.response.data : err);
-                alert("Gagal menghapus pengguna.");
-            }
+            Swal.fire({
+                title: "Apakah Anda yakin?",
+                text: "Anda tidak akan dapat mengembalikan pengguna ini!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Ya, hapus!",
+                cancelButtonText: "Batal",
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const token = localStorage.getItem("token");
+                        await axios.delete(
+                            `${this.baseURL}api/user/${userId}/delete`,
+                            {
+                                headers: { Authorization: `Bearer ${token}` },
+                            }
+                        );
+
+                        this.fetchUsers();
+
+                        Swal.fire(
+                            "Terhapus!",
+                            "Pengguna telah dihapus.",
+                            "success"
+                        );
+                    } catch (err) {
+                        console.error(
+                            "Error deleting user:",
+                            err.response ? err.response.data : err
+                        );
+
+                        Swal.fire(
+                            "Gagal!",
+                            "Gagal menghapus pengguna.",
+                            "error"
+                        );
+                    }
+                }
+            });
         },
     },
 };
