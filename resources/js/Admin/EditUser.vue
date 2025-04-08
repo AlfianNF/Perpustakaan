@@ -3,7 +3,7 @@
       <Sidebar />
       <div class="flex-1 flex flex-col">
         <Navbar />
-        <div class="flex-1 overflow-x-hidden overflow-y-auto p-4">
+        <div class="flex-1 p-4  max-h-screen">
           <h2 class="text-2xl font-semibold mb-4">Edit Pengguna</h2>
           <div v-if="loading" class="text-center text-gray-600">Loading...</div>
           <div v-if="error" class="text-red-500 text-center">{{ error }}</div>

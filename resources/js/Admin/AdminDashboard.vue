@@ -1,42 +1,51 @@
 <template>
-  <div class="flex">
-      <Sidebar />
-      <div class="flex-1 flex flex-col">
-          <Navbar />
-          <div class="flex flex-row flex-wrap justify-between px-4">
-              <div class="w-full sm:w-1/2 lg:w-1/3">
-                  <div class="bg-white rounded-lg p-4 mx-1 shadow-lg">
-                      <DashboardChart
-                          :chart-data="highlightedUserChartData"
-                          :chart-options="defaultChartOptions('Data User', 'user')"
-                          v-if="userChartData.datasets[0].data.length > 0"
-                      />
-                  </div>
+    <div class="flex">
+      <Sidebar />     
+      <div class="ml-64 flex flex-col w-full">
+        <Navbar />
+        <div class="flex-1 p-4 max-h-screen">
+          
+          <!-- Wrapper Chart: Baris menyamping -->
+          <div class="flex flex-wrap -mx-1">
+            <!-- Chart 1 -->
+            <div class="w-full sm:w-1/2 lg:w-1/3 px-1 mb-4">
+              <div class="bg-white rounded-lg p-4 shadow-lg">
+                <DashboardChart
+                  :chart-data="highlightedUserChartData"
+                  :chart-options="defaultChartOptions('Data User', 'user')"
+                  v-if="userChartData.datasets[0].data.length > 0"
+                />
               </div>
-
-              <div class="w-full sm:w-1/2 lg:w-1/3">
-                  <div class="bg-white rounded-lg shadow-lg p-4 mx-1">
-                      <DashboardChart
-                          :chart-data="highlightedPinjamChartData"
-                          :chart-options="defaultChartOptions('Data Peminjaman', 'pinjam')"
-                          v-if="pinjamChartData.datasets[0].data.length > 0"
-                      />
-                  </div>
+            </div>
+  
+            <!-- Chart 2 -->
+            <div class="w-full sm:w-1/2 lg:w-1/3 px-1 mb-4">
+              <div class="bg-white rounded-lg p-4 shadow-lg">
+                <DashboardChart
+                  :chart-data="highlightedPinjamChartData"
+                  :chart-options="defaultChartOptions('Data Peminjaman', 'pinjam')"
+                  v-if="pinjamChartData.datasets[0].data.length > 0"
+                />
               </div>
-
-              <div class="w-full sm:w-1/2 lg:w-1/3">
-                  <div class="bg-white rounded-lg shadow-lg p-4 mx-1">
-                      <DashboardChart
-                          :chart-data="highlightedKembaliChartData"
-                          :chart-options="defaultChartOptions('Data Pengembalian', 'kembali')"
-                          v-if="kembaliChartData.datasets[0].data.length > 0"
-                      />
-                  </div>
+            </div>
+  
+            <!-- Chart 3 -->
+            <div class="w-full sm:w-1/2 lg:w-1/3 px-1 mb-4">
+              <div class="bg-white rounded-lg p-4 shadow-lg">
+                <DashboardChart
+                  :chart-data="highlightedKembaliChartData"
+                  :chart-options="defaultChartOptions('Data Pengembalian', 'kembali')"
+                  v-if="kembaliChartData.datasets[0].data.length > 0"
+                />
               </div>
+            </div>
           </div>
+  
+        </div>
       </div>
-  </div>
+    </div>
 </template>
+  
 
 <script>
 import Sidebar from "@/components/Sidebar.vue";
@@ -102,7 +111,7 @@ export default {
       this.fetchDashboardData();
   },
   methods: {
-      getHighlightedChartData(baseChartData, activeIndex) {
+    getHighlightedChartData(baseChartData, activeIndex) {
           const originalColors = baseChartData.datasets[0].backgroundColor;
           return {
               ...baseChartData,
@@ -117,31 +126,43 @@ export default {
                   },
               ],
           };
-      },
-      defaultChartOptions(title, key) {
-          return {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                  title: {
-                      display: true,
-                      text: title,
-                      font: { size: 16 },
-                  },
-                  legend: {
-                      position: "bottom",
-                  },
-              },
-              onClick: (e, elements) => {
-                  if (elements.length > 0) {
-                      const index = elements[0].index;
-                      this.clickedIndex[key] = index;
-                  } else {
-                      this.clickedIndex[key] = null;
-                  }
-              },
-          };
-      },
+    },
+    defaultChartOptions(title, key) {
+        return {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+            title: {
+                display: true,
+                text: title,
+                font: { size: 16 },
+            },
+            legend: {
+                position: "bottom",
+            },
+            datalabels: {
+                color: "#000",
+                font: {
+                weight: 'bold'
+                },
+                formatter: (value, context) => {
+                const data = context.chart.data.datasets[0].data;
+                const total = data.reduce((sum, val) => sum + val, 0);
+                const percent = total ? ((value / total) * 100).toFixed(1) : 0;
+                return `${percent}%`;
+                },
+            },
+            },
+            onClick: (e, elements) => {
+            if (elements.length > 0) {
+                const index = elements[0].index;
+                this.clickedIndex[key] = index;
+            } else {
+                this.clickedIndex[key] = null;
+            }
+            },
+        };
+    },
       async fetchDashboardData() {
           try {
               const token = localStorage.getItem("token");
@@ -182,6 +203,7 @@ export default {
           }
       },
   },
+  
 };
 </script>
 

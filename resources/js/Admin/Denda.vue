@@ -1,9 +1,9 @@
 <template>
     <div class="flex">
         <Sidebar />
-        <div class="flex-1 flex flex-col">
+        <div class="ml-64 flex flex-col w-full">
             <Navbar />
-            <div class="flex-1 overflow-x-hidden overflow-y-auto p-4">
+            <div class="flex-1 p-4 max-h-screen">
                 <h1 class="text-2xl font-semibold mb-4">Daftar Denda</h1>
                 <div v-if="loading">Loading...</div>
                 <div v-else>
@@ -58,11 +58,28 @@
                                             @click="bayar(denda.id)"
                                             class="inline-flex items-center px-3 py-1 bg-blue-500 text-white rounded-md mr-2"
                                         >
-                                            <img
-                                                src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWNpcmNsZS1kb2xsYXItc2lnbiI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiLz48cGF0aCBkPSJNMTYgOGgtNmEyIDIgMCAxIDAgMCA0aDRhMiAyIDAgMSAxIDAgNEg4Ii8+PHBhdGggZD0iTTEyIDE4VjYiLz48L3N2Zz4="
-                                                alt=""
-                                                class="mr-1"
-                                            />
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="20"
+                                                height="20"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="2"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                class="lucide lucide-circle-dollar-sign-icon lucide-circle-dollar-sign mr-2"
+                                            >
+                                                <circle
+                                                    cx="12"
+                                                    cy="12"
+                                                    r="10"
+                                                />
+                                                <path
+                                                    d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"
+                                                />
+                                                <path d="M12 18V6" />
+                                            </svg>
                                             Bayar
                                         </button>
                                     </td>

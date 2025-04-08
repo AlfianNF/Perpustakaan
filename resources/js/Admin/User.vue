@@ -1,9 +1,9 @@
 <template>
     <div class="flex">
-        <Sidebar />
-        <div class="flex-1 flex flex-col">
-            <Navbar />
-            <div class="flex-1 overflow-x-hidden overflow-y-auto p-4">
+      <Sidebar />     
+      <div class="ml-64 flex flex-col w-full">
+        <Navbar />
+        <div class="flex-1 p-4 max-h-screen">
                 <h2 class="text-2xl font-semibold mb-4">Daftar Pengguna</h2>
 
                 <div class="mb-4">

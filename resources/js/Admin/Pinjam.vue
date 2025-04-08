@@ -1,9 +1,9 @@
 <template>
     <div class="flex">
-        <Sidebar />
-        <div class="flex-1 flex flex-col">
-            <Navbar />
-            <div class="flex-1 overflow-x-hidden overflow-y-auto p-6">
+      <Sidebar />     
+      <div class="ml-64 flex flex-col w-full">
+        <Navbar />
+        <div class="flex-1 p-4 max-h-screen">
                 <h1 class="text-xl font-semibold mb-4">Daftar Peminjaman</h1>
 
                 <div class="mb-4 flex gap-4 items-center">

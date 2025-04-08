@@ -1,9 +1,9 @@
 <template>
   <div class="flex">
-    <Sidebar />
-    <div class="flex-1 flex flex-col">
+    <Sidebar />     
+    <div class="ml-64 flex flex-col w-full">
       <Navbar />
-      <div class="flex-1 overflow-x-hidden overflow-y-auto p-4">
+      <div class="flex-1 p-4 max-h-screen">
         <h2 class="text-2xl font-semibold mb-4">Edit Profil</h2>
         <form @submit.prevent="updateProfile">
           <div class="mb-4">

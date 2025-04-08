@@ -112,7 +112,7 @@ class QueryService
 
     protected function categoryQuery(Builder $query, Request $request): Builder
     {
-        $query->select('name', 'description');
+        $query->select('id','name', 'description');
 
         $search = $request->input('search');
         if (!empty($search)) {

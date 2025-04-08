@@ -41,3 +41,7 @@ Route::get('/dashboard-admin/kembali', function () {
 Route::get('/dashboard-admin/denda', function () {
     return view('admin.setting');
 });
+
+Route::get('/dashboard-admin/buku', function () {
+    return view('admin.buku');
+});

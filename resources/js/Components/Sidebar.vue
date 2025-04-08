@@ -1,6 +1,6 @@
 <template>
-    <aside class="bg-gray-800 text-white w-64 min-h-screen">
-        <div class="p-4">
+<aside class="fixed top-0 left-0 bg-gray-800 text-white w-64 h-screen overflow-y-auto">
+    <div class="p-4">
             <h2 class="text-xl font-semibold mb-4">Admin Panel</h2>
             <ul>
                 <li class="mb-2">
@@ -55,6 +55,33 @@
                             <circle cx="12" cy="7" r="4" />
                         </svg>
                         Users
+                    </router-link>
+                </li>
+                <li class="mb-2">
+                    <router-link
+                        to="/dashboard-admin/buku"
+                        class="flex items-center hover:bg-gray-700 p-2 rounded"
+                        active-class="bg-gray-700"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="white"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="mr-2 lucide lucide-book-text-icon lucide-book-text"
+                        >
+                            <path
+                                d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"
+                            />
+                            <path d="M8 11h8" />
+                            <path d="M8 7h6" />
+                        </svg>
+                        <span class="text-white">Buku</span>
                     </router-link>
                 </li>
                 <li class="mb-2">

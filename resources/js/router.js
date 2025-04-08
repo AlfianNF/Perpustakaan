@@ -10,6 +10,7 @@ import AdminEditUserDashboard from './Admin/EditUser.vue';
 import AdminPinjam from './Admin/Pinjam.vue';
 import AdminKembali from './Admin/Kembali.vue';
 import AdminDenda from './Admin/Denda.vue';
+import AdminBuku from './Admin/Buku.vue';
 
 const routes = [
     { path: '/', component: LoginComponent },
@@ -21,6 +22,7 @@ const routes = [
     { path: '/dashboard-admin/users', component: AdminUserDashboard, meta: { requiresAuth: true } },
     { path: '/dashboard-admin/users/:id/edit', component: AdminEditUserDashboard, meta: { requiresAuth: true } },
     { path: '/dashboard-admin/settings', component: AdminSettingDashboard, meta: { requiresAuth: true } },
+    { path: '/dashboard-admin/buku', component: AdminBuku, meta: { requiresAuth: true } },
     { path: '/dashboard-admin/pinjam', component: AdminPinjam, meta: { requiresAuth: true } },
     { path: '/dashboard-admin/kembali', component: AdminKembali, meta: { requiresAuth: true } },
     { path: '/dashboard-admin/denda', component: AdminDenda, meta: { requiresAuth: true } },
