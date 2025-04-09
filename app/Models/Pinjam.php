@@ -129,7 +129,7 @@ class Pinjam extends Model
                 $query->select('id', 'name'); 
             },
             'buku' => function ($query) {
-                $query->select('id','title','isbn', 'author','category','publish_date')
+                $query->select('id','title','isbn', 'author','category','publish_date','image')
                     ->with([
                         'category:id,name' 
                     ]); 

@@ -1,100 +1,105 @@
 <template>
-    <div class="min-h-screen bg-gray-100 p-8">
-        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">
-            Daftar Buku
-        </h1>
-
-        <div class="mb-6 flex justify-center">
-            <input
-                v-model="searchQuery"
-                @input="searchBooks"
-                type="text"
-                placeholder="Cari buku berdasarkan judul,penulis atau kategori..."
-                class="px-4 py-2 w-96 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-        </div>
-
-        <div class="mb-6 flex justify-center flex-wrap">
+    <div
+        class="flex justify-between items-center px-8 py-4 bg-white shadow-md mb-6 rounded-b-lg"
+    >
+        <h1 class="text-2xl font-bold text-gray-800">Daftar Buku</h1>
+        <div class="flex items-center space-x-4">
+            <span class="text-gray-700 font-medium">
+                <a
+                    href="http://belajar.test/user/profile"
+                    class="hover:underline"
+                    >Halo, {{ userName }}</a
+                >
+            </span>
             <button
-                v-for="category in categories"
-                :key="category.id"
-                @click="filterByCategory(category.name)"
-                class="px-4 py-2 mx-2 my-1 bg-gray-200 rounded-lg hover:bg-gray-300"
+                @click="logout"
+                class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
             >
-                {{ category.name }}
+                Logout
             </button>
         </div>
+    </div>
+    <div class="mb-6 flex justify-center">
+        <input
+            v-model="searchQuery"
+            @input="searchBooks"
+            type="text"
+            placeholder="Cari buku berdasarkan judul,penulis atau kategori..."
+            class="px-4 py-2 w-96 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+    </div>
 
-        <div v-if="loading" class="text-center text-gray-600">Loading...</div>
-        <div v-if="error" class="text-red-500 text-center">{{ error }}</div>
-
-        <div
-            v-if="!loading && bukuList.length === 0"
-            class="text-center text-gray-600"
-        >
-            Tidak ada buku tersedia.
-        </div>
-
-        <div
-            v-if="bukuList.length > 0"
-            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6"
-        >
-            <div
-                v-for="buku in bukuList"
-                :key="buku.id"
-                class="bg-white p-4 rounded-lg shadow-md cursor-pointer"
-                @click="showBook(buku.id)"
-            >
-                <div class="image-container">
-                    <img
-                        :src="getImageUrl(buku.image)"
-                        alt="Buku"
-                        class="book-image"
-                    />
-                </div>
-
-                <h2 class="text-xl font-semibold text-gray-800">
-                    {{ buku.title }}
-                </h2>
-                <p class="text-gray-600">Penulis: {{ buku.author }}</p>
-                <p class="text-gray-600">ISBN: {{ buku.isbn }}</p>
-                <p class="text-gray-600">
-                    Kategori: {{ buku.category?.name || "Tidak ada kategori" }}
-                </p>
-                <p class="text-gray-600">
-                    Tanggal Terbit: {{ buku.publish_date }}
-                </p>
-            </div>
-        </div>
-
-        <div
-            v-if="totalPages > 1"
-            class="flex justify-center items-center mt-6 space-x-4"
-        >
-            <button
-                @click="changePage(currentPage - 1)"
-                :disabled="currentPage === 1"
-                class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 disabled:opacity-50"
-            >
-                Previous
-            </button>
-            <span class="text-gray-700"
-                >Page {{ currentPage }} of {{ totalPages }}</span
-            >
-            <button
-                @click="changePage(currentPage + 1)"
-                :disabled="currentPage === totalPages"
-                class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 disabled:opacity-50"
-            >
-                Next
-            </button>
-        </div>
-
+    <div class="mb-6 flex justify-center flex-wrap">
         <button
-            @click="logout"
-            class="mt-6 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+            v-for="category in categories"
+            :key="category.id"
+            @click="filterByCategory(category.name)"
+            class="px-4 py-2 mx-2 my-1 bg-gray-200 rounded-lg hover:bg-gray-300"
         >
-            Logout
+            {{ category.name }}
+        </button>
+    </div>
+
+    <div v-if="loading" class="text-center text-gray-600">Loading...</div>
+    <div v-if="error" class="text-red-500 text-center">{{ error }}</div>
+
+    <div
+        v-if="!loading && bukuList.length === 0"
+        class="text-center text-gray-600"
+    >
+        Tidak ada buku tersedia.
+    </div>
+
+    <div
+        v-if="bukuList.length > 0"
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 px-6"
+    >
+        <div
+            v-for="buku in bukuList"
+            :key="buku.id"
+            class="bg-white p-4 rounded-lg shadow-md cursor-pointer space-y-2"
+            @click="showBook(buku.id)"
+        >
+            <div class="image-container">
+                <img
+                    :src="getImageUrl(buku.image)"
+                    alt="Buku"
+                    class="book-image"
+                />
+            </div>
+
+            <h2 class="text-xl font-semibold text-gray-800">
+                {{ buku.title }}
+            </h2>
+            <p class="text-gray-600">Penulis: {{ buku.author }}</p>
+            <p class="text-gray-600">ISBN: {{ buku.isbn }}</p>
+            <p class="text-gray-600">
+                Kategori: {{ buku.category?.name || "Tidak ada kategori" }}
+            </p>
+            <p class="text-gray-600">Tanggal Terbit: {{ buku.publish_date }}</p>
+        </div>
+    </div>
+
+    <div
+        v-if="totalPages > 1"
+        class="flex justify-center items-center mt-6 space-x-4"
+    >
+        <button
+            @click="changePage(currentPage - 1)"
+            :disabled="currentPage === 1"
+            class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 disabled:opacity-50"
+        >
+            Previous
+        </button>
+        <span class="text-gray-700"
+            >Page {{ currentPage }} of {{ totalPages }}</span
+        >
+        <button
+            @click="changePage(currentPage + 1)"
+            :disabled="currentPage === totalPages"
+            class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 disabled:opacity-50"
+        >
+            Next
         </button>
     </div>
 </template>
@@ -104,6 +109,7 @@ import axios from "axios";
 
 export default {
     name: "Dashboard",
+
     data() {
         return {
             bukuList: [],
@@ -116,11 +122,17 @@ export default {
             searchQuery: "",
             categories: [],
             selectedCategoryName: null,
+            userName: "",
         };
     },
     async created() {
-        await Promise.all([this.fetchBooks(), this.fetchCategories()]);
+        await Promise.all([
+            this.fetchUser(),
+            this.fetchBooks(),
+            this.fetchCategories(),
+        ]);
     },
+
     methods: {
         async fetchBooks() {
             this.loading = true;
@@ -199,24 +211,37 @@ export default {
         showBook(bookId) {
             this.$router.push({ name: "ShowBuku", params: { id: bookId } });
         },
+
+        async fetchUser() {
+            try {
+                const token = localStorage.getItem("token");
+                const response = await axios.get(`${this.baseURL}api/user`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                this.userName = response.data.name;
+            } catch (err) {
+                console.error("Gagal mengambil data user:", err);
+                this.userName = "Pengguna";
+            }
+        },
     },
 };
 </script>
 <style scoped>
-    .image-container {
-        overflow: hidden; 
-    }
+.image-container {
+    overflow: hidden;
+}
 
-    .book-image {
-        width: 12rem; 
-        height: 17.5rem; 
-        object-fit: cover;
-        border-radius: 0.5rem;
-        margin: 0 auto 0.75rem;
-        transition: transform 0.3s ease;
-    }
+.book-image {
+    width: 12rem;
+    height: 17.5rem;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    margin: 0 auto 0.75rem;
+    transition: transform 0.3s ease;
+}
 
-    .book-image:hover {
-        transform: scale(1.1);
-    }
+.book-image:hover {
+    transform: scale(1.1);
+}
 </style>

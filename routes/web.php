@@ -14,6 +14,10 @@ Route::get('/dashboard', function () {
     return view('buku.list');
 });
 
+Route::get('/user/profile', function () {
+    return view('buku.list');
+});
+
 Route::get('/dashboard-admin', function () {
     return view('admin.index');
 });

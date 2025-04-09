@@ -11,11 +11,13 @@ import AdminPinjam from './Admin/Pinjam.vue';
 import AdminKembali from './Admin/Kembali.vue';
 import AdminDenda from './Admin/Denda.vue';
 import AdminBuku from './Admin/Buku.vue';
+import Profile from './User/Profile.vue';
 
 const routes = [
     { path: '/', component: LoginComponent },
     { path: '/register', component: RegisterComponent },
     { path: '/dashboard', component: DashboardComponent, meta: { requiresAuth: true } },
+    { path: '/user/profile', component: Profile, meta: { requiresAuth: true } },
     { path: '/book/:id/show', component: ShowBuku, name: 'ShowBuku',meta: { requiresAuth: true } },
 
     { path: '/dashboard-admin', component: AdminDashboard, meta: { requiresAuth: true } },

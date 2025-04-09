@@ -129,7 +129,7 @@ class BukuController extends Controller
         $user = auth()->user()->id;
         $pinjam = Pinjam::where('id_user', $user)
                         ->where('status', 'dipinjam')
-                        ->with(['buku:id,title,isbn,author,category','buku.category:id,name'])
+                        ->with(['buku:id,title,isbn,author,category,image','buku.category:id,name'])
                         ->get();
         
         if($pinjam->isEmpty()){
@@ -142,7 +142,7 @@ class BukuController extends Controller
         $user = auth()->user()->id;
         $pinjam = Pinjam::where('id_user', $user)
                         ->where('status', 'dikembalikan')
-                        ->with(['buku:id,title,isbn,author,category','buku.category:id,name'])
+                        ->with(['buku:id,title,isbn,author,category,image','buku.category:id,name'])
                         ->get();
         
         if($pinjam->isEmpty()){

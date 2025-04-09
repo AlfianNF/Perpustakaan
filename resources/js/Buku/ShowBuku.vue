@@ -1,36 +1,43 @@
 <template>
-    <div class="min-h-screen bg-gray-100 p-8 flex flex-col items-center">
-        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">
-            Detail Buku
-        </h1>
+    <div>
+        <div class="flex justify-between items-center px-8 py-4 bg-white shadow-md rounded-b-lg">
+            <h1 class="text-2xl font-bold text-gray-800">Detail Buku</h1>
+            <div class="flex items-center space-x-4">
+                <button
+                    @click="logout"
+                    class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                >
+                    Logout
+                </button>
+            </div>
+        </div>
 
-        <div v-if="loading" class="text-center text-gray-600">Loading...</div>
-        <div v-if="error" class="text-red-500 text-center">{{ error }}</div>
+        <div class="min-h-screen bg-gray-100 p-8 flex flex-col items-center">
+            <div v-if="loading" class="text-center text-gray-600">Loading...</div>
+            <div v-if="error" class="text-red-500 text-center">{{ error }}</div>
 
-        <div
-            v-if="!loading && book"
-            class="bg-white p-6 rounded-lg shadow-md w-full max-w-xl"
-        >
-            <h2 class="text-2xl font-semibold text-gray-800 mb-4 text-center">
-                {{ book.title }}
-            </h2>
+            <div
+                v-if="!loading && book"
+                class="bg-white p-6 rounded-lg shadow-md w-full max-w-xl"
+            >
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4 text-center">
+                    {{ book.title }}
+                </h2>
 
-            <img
-                :src="getImageUrl(book.image)"
-                alt="Buku"
-                class="w-64 h-96 object-cover rounded-lg mx-auto mb-4 text-center"
-            />
+                <img
+                    :src="getImageUrl(book.image)"
+                    alt="Buku"
+                    class="w-64 h-96 object-contain rounded-lg mx-auto mb-4 text-center bg-white"
+                />
 
-            <div class="text-gray-700 space-y-2">
-                <p><strong>ISBN:</strong> {{ book.isbn }}</p>
-                <p><strong>Penulis:</strong> {{ book.author }}</p>
-                <p>
-                    <strong>Kategori:</strong>
-                    {{ book.category?.name || "Tidak ada kategori" }}
-                </p>
-                <p><strong>Tanggal Terbit:</strong> {{ book.publish_date }}</p>
-                <p>
-                    <strong>Deskripsi:</strong> Lorem ipsum dolor sit amet
+                <div class="text-gray-700 space-y-2">
+                    <p><strong>ISBN:</strong> {{ book.isbn }}</p>
+                    <p><strong>Penulis:</strong> {{ book.author }}</p>
+                    <p><strong>Kategori:</strong> {{ book.category?.name || "Tidak ada kategori" }}</p>
+                    <p><strong>Tanggal Terbit:</strong> {{ book.publish_date }}</p>
+                    <p><strong>Deskripsi:</strong></p>
+                    <p class="text-justify">
+                        Lorem ipsum dolor sit amet
                     consectetur adipisicing elit. Maxime voluptates in officia
                     reprehenderit autem ducimus, ut, exercitationem, adipisci
                     aliquid quia debitis aperiam possimus recusandae. Assumenda
@@ -72,17 +79,20 @@
                     repellendus nostrum quam necessitatibus nam unde odit
                     corrupti veniam. Ipsa maxime ex vel. Accusamus, nulla
                     delectus!
-                </p>
+                    </p>
+                </div>
+
+                <button
+                    @click="$router.push('/dashboard')"
+                    class="mt-6 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                >
+                    Kembali
+                </button>
             </div>
-            <button
-                @click="$router.push('/dashboard')"
-                class="mt-6 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-            >
-                Kembali
-            </button>
         </div>
     </div>
 </template>
+
 
 <script>
 import axios from "axios";
@@ -101,6 +111,10 @@ export default {
         await this.fetchBook();
     },
     methods: {
+        logout() {
+            localStorage.removeItem("token");
+            window.location.href = "/";
+        },
         async fetchBook() {
             this.loading = true;
             try {
